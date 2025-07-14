@@ -10,35 +10,40 @@ async function handleConnect(req) {
     const game = formData.get('game');
     const userKey = formData.get('user_key');
     const serial = formData.get('serial');
-    
+
+    console.log('Incoming POST:', { game, userKey, serial });
+
     // Validate required fields
     if (!game || !userKey || !serial) {
+      console.log('Missing required fields');
       return NextResponse.json({}, { status: 200 });
     }
-    
+
     // Check maintenance mode
     const maintenance = await query('SELECT status FROM onoff WHERE id = 11 LIMIT 1');
     if (maintenance.length > 0 && maintenance[0].status === 'off') {
+      console.log('System in maintenance mode');
       return NextResponse.json({}, { status: 200 });
     }
-    
+
     // Find the key
     const keys = await query(
       'SELECT * FROM keys_code WHERE user_key = ? AND game = ? AND status = 1',
       [userKey, game]
     );
-    
+    console.log('Key lookup result:', keys);
+
     if (keys.length === 0) {
+      console.log('Key not found or inactive');
       return NextResponse.json({}, { status: 200 });
     }
-    
+
     const keyData = keys[0];
-    
-    // Check if key is expired
     if (keyData.expired_date && new Date(keyData.expired_date) < new Date()) {
+      console.log('Key expired');
       return NextResponse.json({}, { status: 200 });
     }
-    
+
     // Check device limit
     let devices = [];
     if (keyData.devices) {
@@ -48,14 +53,15 @@ async function handleConnect(req) {
         devices = [];
       }
     }
-    
+    console.log('Registered devices:', devices);
+
     // Check if device is already registered
     const deviceExists = devices.includes(serial);
-    
     if (!deviceExists && devices.length >= keyData.max_devices) {
+      console.log('Device limit reached');
       return NextResponse.json({}, { status: 200 });
     }
-    
+
     // Add device if not already registered
     if (!deviceExists) {
       devices.push(serial);
@@ -64,27 +70,29 @@ async function handleConnect(req) {
         'UPDATE keys_code SET devices = ? WHERE id_keys = ?',
         [devicesString, keyData.id_keys]
       );
+      console.log('Device added:', serial);
     }
-    
+
     // Get function codes
     const functionCodes = await query('SELECT * FROM function_code WHERE NoCASH = "NoCASH" AND id_path = 1 LIMIT 1');
     const functions = functionCodes.length > 0 ? functionCodes[0] : {};
-    
+    console.log('Function codes:', functions);
+
     // Check if system is online
     if (functions.Online !== 'true') {
+      console.log('System is offline');
       return NextResponse.json({
         status: false,
         reason: functions.Maintenance || 'System offline'
       }, { status: 200 });
     }
-    
+
     // Get mod name and credit info
     const modNameData = await query('SELECT * FROM modname WHERE id = 1 LIMIT 1');
     const modName = modNameData.length > 0 ? modNameData[0].modname : 'NOCASH';
-    
     const ftextData = await query('SELECT * FROM _ftext WHERE id = 1 LIMIT 1');
     const credit = ftextData.length > 0 ? ftextData[0].credit || '0' : '0';
-    
+
     // Calculate expiration date if not set
     let expiredDate = keyData.expired_date;
     if (!expiredDate) {
@@ -94,12 +102,13 @@ async function handleConnect(req) {
         'UPDATE keys_code SET expired_date = ? WHERE id_keys = ?',
         [expiredDate, keyData.id_keys]
       );
+      console.log('Expiration date set:', expiredDate);
     }
-    
+
     // Generate token using the same logic as C++ client
     const authString = `${game}-${userKey}-${serial}-${CONNECT_API_STATIC}`;
     const token = CryptoJS.MD5(authString).toString();
-    
+
     // Prepare response matching C++ client expectations
     const responseData = {
       status: true,
@@ -110,18 +119,16 @@ async function handleConnect(req) {
         modname: modName
       }
     };
-    
+    console.log('Returning success:', responseData);
     return NextResponse.json(responseData, { status: 200 });
-    
+
   } catch (error) {
     console.error('Connect API error:', error);
     return NextResponse.json({}, { status: 200 });
   }
 }
 
-// Handle both GET and POST requests
 export async function GET(req) {
-  // Return web info for GET requests (matching PHP behavior)
   const webInfo = {
     web_info: {
       _client: "Kuro Panel",
@@ -132,7 +139,6 @@ export async function GET(req) {
       Website: "https://t.me/NOCASH_XD"
     }
   };
-  
   return NextResponse.json(webInfo);
 }
 
