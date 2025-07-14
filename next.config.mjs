@@ -2,7 +2,7 @@
 const nextConfig = {
   // Enable API routes
   experimental: {
-    serverComponentsExternalPackages: ['mysql2']
+    serverExternalPackages: ['mysql2']
   },
   
   // Environment variables for Vercel
