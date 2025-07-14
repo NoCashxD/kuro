@@ -39,3 +39,70 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# README files and documentation
+README.md
+*.md
+C++_INTEGRATION_GUIDE.md
+PROJECT_SUMMARY.md
+
+# C++ source files and headers
+*.cpp
+*.h
+*.hpp
+*.c
+*.o
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Database files
+*.sql
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration files with sensitive data
+config.json
+config.js
+database.json
+database.js
+
+# Log files
+*.log
+logs/
+log/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Scripts that might contain sensitive data
+scripts/seed.js
+scripts/test-db.js
+generate-password.js
+
+# License and authentication files
+login.h
+new.sql
+optimize_history.sql
