@@ -36,7 +36,7 @@ export default function UsersPage() {
     setCreating(true);
     try {
       const payload = { ...form };
-      const res = await fetch('/api/users/create', {
+      const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
