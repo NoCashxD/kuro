@@ -220,8 +220,16 @@ export default function UsersPage() {
                     )}
                   </td>
                   <td className="px-4 py-2">${u.saldo}</td>
-                  <td className="px-4 py-2 font-mono">{u.owner}</td>
-                  <td className="px-4 py-2 text-xs">{u.created_at?.slice(0, 10)}</td>
+                  <td className="px-4 py-2 font-mono">
+                    {u.owner}
+                  </td>
+                  <td className="px-4 py-2 text-xs">
+                    {u.expiration_date && new Date(u.expiration_date) < new Date() ? (
+                      <span className="text-red-400 font-bold">{u.expiration_date?.slice(0, 10)} (Expired)</span>
+                    ) : (
+                      u.expiration_date?.slice(0, 10)
+                    )}
+                  </td>
                   {hasPermission(2) && (
                     <td className="px-4 py-2">
                       {canDeleteUser(u) && (

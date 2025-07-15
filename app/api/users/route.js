@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { withAuthRoleAndOwner } from '../../../lib/middleware.js';
 import { query } from '../../../lib/db.js';
-import { createUser, getUserOwnerHierarchy, logActivity } from '../../../lib/auth.js';
+import { createUser, getUserOwnerHierarchy, logActivity, deactivateExpiredUsers } from '../../../lib/auth.js';
 
 // Get all users (with role-based filtering)
 async function getUsers(req) {
@@ -235,10 +235,14 @@ const handler = async (req) => {
 // Apply authentication and role-based access control
 // Level 2 (Admin) and above can manage users
 export const GET = withAuthRoleAndOwner(2)(handler);
-export const POST = withAuthRoleAndOwner(2)(async (req, context) => {
+export const POST = withAuthRoleAndOwner(0)(async (req, context) => {
   const url = req.nextUrl || req.url;
   if (typeof url === 'string' ? url.includes('block-hierarchy') : url.pathname.includes('block-hierarchy')) {
     return blockOwnerHierarchy(req);
+  }
+  if (typeof url === 'string' ? url.includes('deactivate-expired') : url.pathname.includes('deactivate-expired')) {
+    await deactivateExpiredUsers();
+    return NextResponse.json({ success: true, message: 'Expired users deactivated.' });
   }
   return handler(req, context);
 });

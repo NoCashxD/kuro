@@ -31,8 +31,9 @@ async function transferBalance(req) {
       if (recipient.owner !== currentUser.owner && recipient.username !== currentUser.username) {
         return NextResponse.json({ error: 'Recipient not in your hierarchy' }, { status: 403 });
       }
-      // Check admin's saldo
-      const adminSaldo = currentUser.saldo;
+      // Fetch latest admin saldo from DB
+      const [admin] = await query('SELECT saldo FROM users WHERE username = ?', [currentUser.username]);
+      const adminSaldo = admin ? admin.saldo : 0;
       if (adminSaldo < amount) {
         return NextResponse.json({ error: 'Insufficient balance' }, { status: 400 });
       }
