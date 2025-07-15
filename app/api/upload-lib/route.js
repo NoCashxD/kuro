@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { withAuthRoleAndOwner } from '../../../lib/middleware.js';
-import { FTP_HOST, FTP_USER, FTP_PASSWORD } from '../../../lib/ftp-config.js';
 import * as ftp from 'basic-ftp';
 
 export const POST = withAuthRoleAndOwner(1)(async (req) => {
