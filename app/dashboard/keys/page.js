@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuth, useRole } from '../../context/AuthContext';
 import { ROLES, ROLE_LABELS } from '../../../roles';
 import { Key, Plus, Loader2, CheckCircle, XCircle, Trash2, RefreshCw, Clock, Edit2, Copy, Download } from 'lucide-react';
@@ -36,15 +36,26 @@ export default function KeysPage() {
   const [durationUnit, setDurationUnit] = useState('hours'); // 'hours' or 'days'
   const [extendUnit, setExtendUnit] = useState('hours'); // 'hours' or 'days'
   const [useOnlyPrefix, setUseOnlyPrefix] = useState(false);
+  const [search, setSearch] = useState('');
+  const searchTimeout = useRef();
 
   useEffect(() => {
     fetchKeys();
   }, []);
 
-  const fetchKeys = async () => {
+  useEffect(() => {
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      fetchKeys(search);
+    }, 350);
+    return () => clearTimeout(searchTimeout.current);
+  }, [search]);
+
+  const fetchKeys = async (q = '') => {
     setLoading(true);
     try {
-      const res = await fetch('/api/keys');
+      const url = q ? `/api/keys?q=${encodeURIComponent(q)}` : '/api/keys';
+      const res = await fetch(url);
       const data = await res.json();
       if (data.success) setKeys(data.keys);
     } catch (e) {
@@ -157,10 +168,9 @@ export default function KeysPage() {
 
   return (
     <div className="space-y-6 keys">
-      <div className="flex justify-center flex-col sm:flex-row items-center justify-between gap-2">
+      <div className="flex max-[768px]:justify-center flex-col sm:flex-row items-center justify-between gap-2">
         <h1 className="text-2xl font-bold text-text flex items-center gap-2">
           <Key className="h-6 w-6" /> Keys
-          <span className="ml-2 px-2 py-1 rounded bg-gray-700 text-xs font-semibold">{roleLabel}</span>
         </h1>
         <button
           onClick={() => setShowCreate(true)}
@@ -169,11 +179,12 @@ export default function KeysPage() {
           <Plus className="h-4 w-4" /> Generate Keys
         </button>
       </div>
+     
 
       {/* Key Generation Modal */}
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 sm:px-0">
-          <form onSubmit={handleCreate} className="bg-accent p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-md space-y-4 border border-gray-700 max-h-[85vh] overflow-scroll">
+          <form onSubmit={handleCreate} className="bg-accent p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-md space-y-4 border border-gray-700 max-h-[85vh] overflow-scroll"  style={{ scrollbarWidth : "none"}}>
             <h2 className="text-lg font-semibold text-text mb-2">Generate Keys</h2>
             <div>
               <label className="block text-sm ">Game</label>
@@ -215,56 +226,87 @@ export default function KeysPage() {
             </div>
             <div>
               <label className="inline-flex items-center gap-2 text-sm ">
-                <input type="checkbox" checked={useOnlyPrefix} onChange={e => setUseOnlyPrefix(e.target.checked)} />
+                <input type="checkbox" checked={useOnlyPrefix} onChange={e => setUseOnlyPrefix(e.target.checked)} className="accent-gray-600 dark:accent-purple-600" />
                 Use only prefix as key (no random suffix)
               </label>
-              <span className="block text-xs text-gray-400">If checked, keys will be exactly the prefix (e.g., RAMU, SHAM, DHAM)</span>
+              <span className="block text-xs !text-gray-400">If checked, keys will be exactly the prefix (e.g., RAMU, SHAM, DHAM)</span>
             </div>
-            <div className="flex justify-center flex-col sm:flex-row gap-2 mt-4 max-h-[48px]">
-              <button type="button" onClick={() => setShowCreate(false)} className="flex justify-center-1 py-2 rounded bg-gray-600 text-text hover:bg-gray-700">Cancel</button>
-              <button type="submit" disabled={creating} className="flex justify-center-1 py-2 rounded bg-purple-600 text-text hover:bg-purple-700 flex items-center justify-center">
+            <div className="flex justify-center flex-col sm:flex-row gap-2 max-[768px]:mt-16 max-h-[48px] mb-2">
+              <button type="button" onClick={() => setShowCreate(false)} className="p-1 py-2 rounded bg-gray-600 text-text hover:bg-gray-700">Cancel</button>
+              <button type="submit" disabled={creating} className="p-1 py-2 rounded bg-purple-600 text-text hover:bg-purple-700 flex items-center justify-center">
                 {creating ? <Loader2 className="animate-spin h-5 w-5" /> : 'Generate'}
               </button>
-              <button type="button" disabled={creating} onClick={handleTrial} className="flex justify-center-1 !px-2 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center justify-center">1hr Trial</button>
+              <button type="button" disabled={creating} onClick={handleTrial} className="p-1 !px-2 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center justify-center">1hr Trial</button>
             </div>
           </form>
         </div>
       )}
 
       {/* Show Copy/Download after generation */}
-      {generatedKeys.length > 0 && (
-        <div className="flex justify-center flex-col sm:flex-row gap-2 items-center justify-center">
-          <button onClick={handleCopyKeys} className="flex justify-center items-center gap-2 px-4 py-2 bg-green-600 text-text rounded hover:bg-green-700"><Copy className="h-4 w-4" /> Copy Keys</button>
-          <button onClick={handleDownloadKeys} className="flex justify-center items-center gap-2 px-4 py-2 bg-blue-600 text-text rounded hover:bg-blue-700"><Download className="h-4 w-4" /> Download Keys</button>
-        </div>
-      )}
+      
 
       {/* Bulk Actions */}
       {user.level < 3 && (
-        <div className="flex justify-center flex-wrap gap-4 mb-2">
-          <button onClick={() => handleBulk('activate')} disabled={bulkLoading} className="px-3 py-2 rounded bg-green-600 text-text hover:bg-green-700 flex items-center gap-1 max-h-[48px]"><CheckCircle className="h-4 w-4" /> Activate</button>
-          <button onClick={() => handleBulk('deactivate')} disabled={bulkLoading} className="px-3 py-2 rounded bg-yellow-600 text-text hover:bg-yellow-700 flex items-center gap-1 max-h-[48px]"><XCircle className="h-4 w-4" /> Deactivate</button>
-          <button onClick={() => handleBulk('delete')} disabled={bulkLoading} className="px-3 py-2 rounded bg-red-600 text-text hover:bg-red-700 flex items-center gap-1 max-h-[48px]"><Trash2 className="h-4 w-4" /> Delete</button>
-          <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex justify-center items-center gap-4 max-h-[48px]">
-            <input type="number" min={1} max={720} value={extendHours} onChange={e => setExtendHours(Number(e.target.value))} className="w-[126px] px-4 py-1 !mb-0 rounded bg-gray-700 text-text border border-gray-600 max-h-[48px]" />
-            <select className="p-2 rounded bg-gray-700 text-text border border-gray-600 !mb-0" value={extendUnit} onChange={e => setExtendUnit(e.target.value)}>
-              <option value="hours">Hours</option>
-              <option value="days">Days</option>
+        <div className="flex justify-between max-[768px]:w-[calc(100vw-32px)] min-[768px]:flex-wrap min-[768px]:gap-3 mb-2 overflow-x-scroll max-[768px]:p-[.65rem_0] bulky  max-[768px]:bg-[var(--label)] rounded max-[768px]:!text-[13px] " style={{ scrollbarWidth : "none"}}>
+          <span className={`flex min-[768px]:gap-[16px] ${!generatedKeys.length > 0 && "!gap-3"} `}>
+            <button onClick={() => handleBulk('activate')} disabled={bulkLoading} className="px-3 py-2 rounded bg-green-600 text-text hover:bg-green-700 flex items-center gap-1 max-h-[48px]">
+              <CheckCircle className="h-4 w-4" />
+              <span className="hidden sm:inline spbl">Activate</span>
+            </button>
+            <button onClick={() => handleBulk('deactivate')} disabled={bulkLoading} className="px-3 py-2 rounded bg-yellow-600 text-text hover:bg-yellow-700 flex items-center gap-1 max-h-[48px]">
+              <XCircle className="h-4 w-4" />
+              <span className="hidden sm:inline spbl">Deactivate</span>
+            </button>
+            <button onClick={() => handleBulk('delete')} disabled={bulkLoading} className="px-3 py-2 rounded bg-red-600 text-text hover:bg-red-700 flex items-center gap-1 max-h-[48px]">
+              <Trash2 className="h-4 w-4" />
+              <span className="hidden sm:inline spbl">Delete</span>
+            </button>
+            {generatedKeys.length > 0 && (
+              <>
+                <button onClick={handleCopyKeys} className="flex justify-center items-center gap-2 px-4 py-2 bg-green-600 text-text rounded hover:bg-green-700">
+                  <Copy className="h-4 w-4" />
+                  <span className="hidden sm:inline spbl">Copy Keys</span>
+                </button>
+                <button onClick={handleDownloadKeys} className="flex justify-center items-center gap-2 px-4 py-2 bg-blue-600 text-text rounded hover:bg-blue-700">
+                  <Download className="h-4 w-4" />
+                  <span className="hidden sm:inline spbl">Download Keys</span>
+                </button>
+              </>
+            )}
+          </span>
+          <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex justify-center items-center min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px] ">
+            <input type="number" min={1} max={720} value={extendHours} onChange={e => setExtendHours(Number(e.target.value))} className="w-[126px] text-center px-4 py-1 !mb-0 rounded bg-gray-700 text-text border border-gray-600 max-h-[48px] max-[768px]:w-[50px] max-[768px]:h-[34px]" />
+            <select className="max-[768px]:!text-[13px] p-2 rounded bg-gray-700 text-text border border-gray-600 !mb-0 max-[768px]:h-[38px] " value={extendUnit} onChange={e => setExtendUnit(e.target.value)}>
+              <option className='text-[var(--text)]' value="hours">Hours</option>
+              <option className='text-[var(--text)]' value="days">Days</option>
             </select>
-            <button type="submit" disabled={bulkLoading} className="px-3 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center gap-1"><RefreshCw className="h-4 w-4" /> Extend</button>
+            <button type="submit" disabled={bulkLoading} className="px-3 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center gap-1">
+              <RefreshCw className="h-4 w-4" />
+              <span className="hidden sm:inline spbl">Extend</span>
+            </button>
           </form>
         </div>
       )}
-
+ {/* Search Input */}
+ <div className="flex justify-end mt-2 w-full">
+        <input
+          type="text"
+          className="w-full p-2 rounded bg-gray-700 text-text border border-gray-600  !mt-[10px] mx-0"
+          placeholder="Search keys, game, or owner..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+      </div>
       {/* Keys Table */}
-      <div className="overflow-x-auto rounded-lg border border-gray-700">
-        <table className="min-w-full bg-accent text-text text-xs sm:text-sm">
+      <div className="overflow-x-auto rounded-lg border border-gray-700" style={{ scrollbarWidth : "none"}}>
+        <table className="min-w-full bg-accent text-text text-xs sm:text-sm w-max"  >
           <thead>
             <tr>
               {user.level < 3 && <th className="px-2 sm:px-4 py-2">Select</th>}
               <th className="px-2 sm:px-4 py-2 text-left">Key</th>
               <th className="px-2 sm:px-4 py-2 text-left">Game</th>
               <th className="px-2 sm:px-4 py-2 text-left">Duration</th>
+              <th className="px-2 sm:px-4 py-2 text-left">Expiry Date</th>
               <th className="px-2 sm:px-4 py-2 text-left">Max Devices</th>
               <th className="px-2 sm:px-4 py-2 text-left">Status</th>
               <th className="px-2 sm:px-4 py-2 text-left">Owner</th>
@@ -286,16 +328,17 @@ export default function KeysPage() {
             ) : (
               keys.map((k, i) => (
                 <tr key={k.id} className="border-t border-gray-700">
-                  {user.level < 3 && <td className="px-2 sm:px-4 py-2"><input type="checkbox" checked={selected.includes(k.id)} onChange={() => toggleSelect(k.id)} /></td>}
+                  {user.level < 3 && <td className="px-2 sm:px-4 py-2"><input type="checkbox" checked={selected.includes(k.id)} onChange={() => toggleSelect(k.id)} className="accent-gray-600 dark:accent-purple-600" /></td>}
                   <td className="px-2 sm:px-4 py-2 font-mono text-xs break-all max-w-[120px] sm:max-w-none">{k.user_key}</td>
                   <td className="px-2 sm:px-4 py-2">{k.game}</td>
                   <td className="px-2 sm:px-4 py-2">{k.duration}h</td>
+                  <td className="px-2 sm:px-4 py-2 text-xs">{k.expired_date ? (new Date(k.expired_date).toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })) : '-'}</td>
                   <td className="px-2 sm:px-4 py-2">{k.max_devices}</td>
                   <td className="px-2 sm:px-4 py-2">
                     {k.status === 1 ? (
-                      <span className="inline-flex items-center gap-1 text-green-400"><CheckCircle className="h-4 w-4" /> Active</span>
+                      <span className="inline-flex items-center gap-1 !text-green-400"><CheckCircle className="h-4 w-4" /> Active</span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-red-400"><XCircle className="h-4 w-4" /> Inactive</span>
+                      <span className="inline-flex items-center gap-1 !text-red-400"><XCircle className="h-4 w-4" /> Inactive</span>
                     )}
                   </td>
                   <td className="px-2 sm:px-4 py-2 font-mono">{k.owner}</td>

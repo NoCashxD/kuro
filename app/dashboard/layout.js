@@ -15,16 +15,20 @@ import {
   FileText,
   Shield,
   Sun,
-  Moon
+  Moon,
+  Folder
 } from 'lucide-react';
 import { useState } from 'react';
 import { useTheme } from '../context/AuthContext';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function DashboardLayout({ children }) {
   const { user, loading, logout, isOwner, isAdmin, isDev } = useAuth();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -50,10 +54,11 @@ export default function DashboardLayout({ children }) {
     { name: 'Keys', href: '/dashboard/keys', icon: Key, level: 3 },
     { name: 'Statistics', href: '/dashboard/stats', icon: BarChart3, level: 2 },
     { name: 'History', href: '/dashboard/history', icon: FileText, level: 2 },
-    { name: 'Settings', href: '/dashboard/settings', icon: Settings, level: 1 },
     // New: Balance Transfer (Owner/Admin only)
     ...(user.level <= 2 ? [{ name: 'Transfer Balance', href: '/dashboard/users/transfer-balance', icon: Key, level: 2 }] : []),
-    // Removed: Owner Server Link (feature deleted)
+    // File Manager (external link)
+    { name: 'File Manager', href: 'https://keysgen.site/filemanager/', icon: Folder, level: 3, external: true },
+      { name: 'Settings', href: '/dashboard/settings', icon: Settings, level: 1 },
   ].filter(item => user.level <= item.level);
 
   const getRoleBadge = () => {
@@ -66,7 +71,7 @@ export default function DashboardLayout({ children }) {
   const roleBadge = getRoleBadge();
 
   return (
-    <div className="min-h-screen bg-background min-[768px]:flex font-mono">
+    <div className="min-h-screen bg-background min-[1024px]:flex font-mono">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
@@ -76,7 +81,7 @@ export default function DashboardLayout({ children }) {
       )}
 
       {/* Sidebar */}
-      <div className={`max-[768px]:fixed sticky inset-y-0 left-0 z-50 w-64 bg-accent flex flex-col h-screen transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:inset-0 ${
+      <div className={`max-[1024px]:fixed sticky inset-y-0 left-0 z-50 w-64 bg-accent flex flex-col h-screen transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:inset-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-accent flex-shrink-0">
@@ -94,20 +99,36 @@ export default function DashboardLayout({ children }) {
         <nav className="mt-6 px-3 flex-1 overflow-y-auto">
           <div className="space-y-1">
             {navigation.map((item) => {
-              const isActive = router.pathname === item.href;
+              const isActive = pathname === item.href;
+              if (item.external) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`group flex items-center px-3 py-2 text-sm font-medium rounded transition-colors font-mono hover:bg-[#232323] hover:text-text`}
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <item.icon className="mr-3 h-5 w-5" />
+                    {item.name}
+                  </a>
+                );
+              }
               return (
-                <a
+                <Link
                   key={item.name}
                   href={item.href}
                   className={`group flex items-center px-3 py-2 text-sm font-medium rounded transition-colors font-mono ${
                     isActive
-                      ? 'bg-blue-600 text-text shadow-card'
+                      ? 'bg-blue-600 text-white shadow-card'
                       : ' hover:bg-[#232323] hover:text-text'
                   }`}
+                  onClick={() => setSidebarOpen(false)}
                 >
                   <item.icon className="mr-3 h-5 w-5" />
                   {item.name}
-                </a>
+                </Link>
               );
             })}
           </div>
@@ -156,7 +177,7 @@ export default function DashboardLayout({ children }) {
               <Menu className="h-6 w-6" />
             </button>
             <div className="flex-1" />
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 setting ">
               
               <button
                 onClick={toggleTheme}
@@ -164,7 +185,7 @@ export default function DashboardLayout({ children }) {
                 aria-label="Toggle theme"
               >
                 {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                <span className="hidden sm:inline">{theme === 'dark' ? 'Light' : 'Dark'} Mode</span>
+                {/* <span className="hidden sm:inline spbl">{theme === 'dark' ? 'Light' : 'Dark'} Mode</span> */}
               </button>
             </div>
           </div>

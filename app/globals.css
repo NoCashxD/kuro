@@ -44,7 +44,8 @@ a {
   text-decoration: none;
 }
 a:hover {
-  text-decoration: underline;
+  background: var(--label);
+  color: var(--text);
 }
 
 .card {
@@ -69,8 +70,8 @@ button, .btn {
   max-height: 48px;
 }
 button:hover, .btn:hover {
-  background: #232323;
-  color: #fff;
+  background: var(--label);
+  color: var(--text);
   box-shadow: 0 2px 12px 0 rgba(0,0,0,0.7);
 }
 .setting span , .spbl{
@@ -96,10 +97,7 @@ input, textarea, select {
   outline: none;
   transition: border 0.2s, box-shadow 0.2s;
 }
-input:focus, textarea:focus, select:focus {
-  border-color: #6cf;
-  box-shadow: 0 0 0 2px #6cf33a33;
-}
+
 
 pre, code {
   font-family: 'IBM Plex Mono', monospace;
@@ -137,3 +135,12 @@ hr {
 .bg-accent { background: var(--accent); }
 .shadow { box-shadow: var(--shadow); }
 .rounded { border-radius: var(--radius); }
+
+@media (max-width: 767px) {
+  .bulky button , .bulky input,.bulky select{
+    padding: 10px;
+    background: transparent;
+    box-shadow: none;
+    border: none;
+  }
+}

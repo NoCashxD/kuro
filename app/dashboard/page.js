@@ -137,9 +137,9 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="mt-4 flex items-center">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              <span className="ml-1 text-sm text-green-500">{card.change}</span>
-              <span className="ml-2 text-sm ">from last month</span>
+              <TrendingUp className="h-4 w-4 !text-green-500" />
+              <span className="ml-1 text-sm !text-green-500">{card.change}</span>
+              <span className="ml-2 text-sm spbl">from last month</span>
             </div>
           </div>
         ))}
@@ -164,10 +164,17 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex items-center">
-            <Clock className="h-5 w-5  mr-3" />
+            <Clock className="h-5 w-5 mr-3" />
             <div>
-              <p className="text-sm ">Account Status</p>
-              <p className="text-green-500 font-medium">Active</p>
+              <p className="text-sm">Account Expiry</p>
+              {user.expiration_date ? (
+                <p className={`font-medium ${new Date(user.expiration_date) < new Date() ? 'text-red-400' : 'text-green-500'}`}>
+                  {user.expiration_date.slice(0, 10)}
+                  {new Date(user.expiration_date) < new Date() ? ' (Expired)' : ''}
+                </p>
+              ) : (
+                <p className="text-gray-400">No expiry set</p>
+              )}
             </div>
           </div>
         </div>

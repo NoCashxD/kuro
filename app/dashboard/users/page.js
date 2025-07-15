@@ -179,7 +179,7 @@ export default function UsersPage() {
       )}
 
       {/* Users Table */}
-      <div className="overflow-x-auto rounded-lg border border-gray-700 mt-4">
+      <div className="overflow-x-auto rounded-lg border border-gray-700 mt-4" style={{ scrollbarWidth : "none"}}>
         <table className="min-w-full bg-accent text-text">
           <thead>
             <tr>
