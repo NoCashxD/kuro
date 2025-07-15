@@ -156,15 +156,15 @@ export default function KeysPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+    <div className="space-y-6 keys">
+      <div className="flex justify-center flex-col sm:flex-row items-center justify-between gap-2">
         <h1 className="text-2xl font-bold text-text flex items-center gap-2">
           <Key className="h-6 w-6" /> Keys
           <span className="ml-2 px-2 py-1 rounded bg-gray-700 text-xs font-semibold">{roleLabel}</span>
         </h1>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-text rounded hover:bg-purple-700 w-full sm:w-auto"
+          className="flex justify-center items-center gap-2 px-4 py-2 bg-purple-600 text-text rounded hover:bg-purple-700 w-full sm:w-auto"
         >
           <Plus className="h-4 w-4" /> Generate Keys
         </button>
@@ -176,20 +176,20 @@ export default function KeysPage() {
           <form onSubmit={handleCreate} className="bg-accent p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-md space-y-4 border border-gray-700 max-h-[85vh] overflow-scroll">
             <h2 className="text-lg font-semibold text-text mb-2">Generate Keys</h2>
             <div>
-              <label className="block text-sm text-gray-300">Game</label>
+              <label className="block text-sm ">Game</label>
               <select className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" required value={form.game} onChange={e => setForm(f => ({ ...f, game: e.target.value }))}>
                 <option value="">Select Game</option>
                 {GAME_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-300">Custom Prefix</label>
+              <label className="block text-sm ">Custom Prefix</label>
               <input type="text" className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" value={form.prefix} onChange={e => setForm(f => ({ ...f, prefix: e.target.value }))} maxLength={16} />
               <span className="text-xs text-gray-400">Keys will be generated as {form.prefix}-XYZ123</span>
             </div>
             <div>
-              <label className="block text-sm text-gray-300">Quantity</label>
-              <div className="flex gap-2 mb-2 flex-wrap">
+              <label className="block text-sm ">Quantity</label>
+              <div className="flex justify-center gap-2 mb-2 flex-wrap">
                 {[3, 5, 10, 50, 100].map(q => (
                   <button type="button" key={q} className={`px-2 py-1 rounded ${form.quantity === q ? 'bg-purple-700 text-white' : 'bg-gray-700 text-gray-200'}`} onClick={() => setForm(f => ({ ...f, quantity: q }))}>{q}</button>
                 ))}
@@ -198,8 +198,8 @@ export default function KeysPage() {
               <input type="number" min={1} max={999} className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" required value={form.quantity} onChange={e => setForm(f => ({ ...f, quantity: Number(e.target.value) }))} />
             </div>
             <div>
-              <label className="block text-sm text-gray-300">Duration</label>
-              <div className="flex gap-2 items-center mb-2">
+              <label className="block text-sm ">Duration</label>
+              <div className="flex justify-center gap-2 items-center mb-2">
                 <select className="w-full p-2 rounded bg-gray-700 text-text border border-gray-600" required value={form.duration} onChange={e => setForm(f => ({ ...f, duration: Number(e.target.value) }))}>
                   {DURATION_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                 </select>
@@ -210,22 +210,22 @@ export default function KeysPage() {
               </div>
             </div>
             <div>
-              <label className="block text-sm text-gray-300">Max Devices</label>
+              <label className="block text-sm ">Max Devices</label>
               <input type="number" min={1} max={10} className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" required value={form.max_devices} onChange={e => setForm(f => ({ ...f, max_devices: Number(e.target.value) }))} />
             </div>
             <div>
-              <label className="inline-flex items-center gap-2 text-sm text-gray-300">
+              <label className="inline-flex items-center gap-2 text-sm ">
                 <input type="checkbox" checked={useOnlyPrefix} onChange={e => setUseOnlyPrefix(e.target.checked)} />
                 Use only prefix as key (no random suffix)
               </label>
               <span className="block text-xs text-gray-400">If checked, keys will be exactly the prefix (e.g., RAMU, SHAM, DHAM)</span>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2 mt-4 max-h-[48px]">
-              <button type="button" onClick={() => setShowCreate(false)} className="flex-1 py-2 rounded bg-gray-600 text-text hover:bg-gray-700">Cancel</button>
-              <button type="submit" disabled={creating} className="flex-1 py-2 rounded bg-purple-600 text-text hover:bg-purple-700 flex items-center justify-center">
+            <div className="flex justify-center flex-col sm:flex-row gap-2 mt-4 max-h-[48px]">
+              <button type="button" onClick={() => setShowCreate(false)} className="flex justify-center-1 py-2 rounded bg-gray-600 text-text hover:bg-gray-700">Cancel</button>
+              <button type="submit" disabled={creating} className="flex justify-center-1 py-2 rounded bg-purple-600 text-text hover:bg-purple-700 flex items-center justify-center">
                 {creating ? <Loader2 className="animate-spin h-5 w-5" /> : 'Generate'}
               </button>
-              <button type="button" disabled={creating} onClick={handleTrial} className="flex-1 !px-2 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center justify-center">1hr Trial</button>
+              <button type="button" disabled={creating} onClick={handleTrial} className="flex justify-center-1 !px-2 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center justify-center">1hr Trial</button>
             </div>
           </form>
         </div>
@@ -233,19 +233,19 @@ export default function KeysPage() {
 
       {/* Show Copy/Download after generation */}
       {generatedKeys.length > 0 && (
-        <div className="flex flex-col sm:flex-row gap-2 items-center justify-center">
-          <button onClick={handleCopyKeys} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-text rounded hover:bg-green-700"><Copy className="h-4 w-4" /> Copy Keys</button>
-          <button onClick={handleDownloadKeys} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-text rounded hover:bg-blue-700"><Download className="h-4 w-4" /> Download Keys</button>
+        <div className="flex justify-center flex-col sm:flex-row gap-2 items-center justify-center">
+          <button onClick={handleCopyKeys} className="flex justify-center items-center gap-2 px-4 py-2 bg-green-600 text-text rounded hover:bg-green-700"><Copy className="h-4 w-4" /> Copy Keys</button>
+          <button onClick={handleDownloadKeys} className="flex justify-center items-center gap-2 px-4 py-2 bg-blue-600 text-text rounded hover:bg-blue-700"><Download className="h-4 w-4" /> Download Keys</button>
         </div>
       )}
 
       {/* Bulk Actions */}
       {user.level < 3 && (
-        <div className="flex flex-wrap gap-4 mb-2">
+        <div className="flex justify-center flex-wrap gap-4 mb-2">
           <button onClick={() => handleBulk('activate')} disabled={bulkLoading} className="px-3 py-2 rounded bg-green-600 text-text hover:bg-green-700 flex items-center gap-1 max-h-[48px]"><CheckCircle className="h-4 w-4" /> Activate</button>
           <button onClick={() => handleBulk('deactivate')} disabled={bulkLoading} className="px-3 py-2 rounded bg-yellow-600 text-text hover:bg-yellow-700 flex items-center gap-1 max-h-[48px]"><XCircle className="h-4 w-4" /> Deactivate</button>
           <button onClick={() => handleBulk('delete')} disabled={bulkLoading} className="px-3 py-2 rounded bg-red-600 text-text hover:bg-red-700 flex items-center gap-1 max-h-[48px]"><Trash2 className="h-4 w-4" /> Delete</button>
-          <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex items-center gap-4 max-h-[48px]">
+          <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex justify-center items-center gap-4 max-h-[48px]">
             <input type="number" min={1} max={720} value={extendHours} onChange={e => setExtendHours(Number(e.target.value))} className="w-[126px] px-4 py-1 !mb-0 rounded bg-gray-700 text-text border border-gray-600 max-h-[48px]" />
             <select className="p-2 rounded bg-gray-700 text-text border border-gray-600 !mb-0" value={extendUnit} onChange={e => setExtendUnit(e.target.value)}>
               <option value="hours">Hours</option>

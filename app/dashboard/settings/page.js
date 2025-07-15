@@ -5,6 +5,44 @@ import { useAuth } from '../../context/AuthContext';
 import { Settings, Loader2, Save, ToggleLeft, ToggleRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+function UploadLib() {
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    setMessage('');
+    const file = e.target.elements.file.files[0];
+    if (!file) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch('/api/upload-lib', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      setMessage(data.success ? 'Upload successful!' : data.error || 'Upload failed');
+    } catch (err) {
+      setMessage('Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleUpload} className="my-8 bg-accent p-6 rounded-lg border border-none flex flex-col gap-4">
+      <label className="block text-lg font-semibold text-text mb-2">Upload .lib file to FTP</label>
+      <input type="file" name="file" accept=".lib" required className="bg-background text-text rounded p-2 border border-border" />
+      <button type="submit" disabled={uploading} className="w-fit px-4 py-2 bg-primary text-white rounded hover:bg-secondary">
+        {uploading ? 'Uploading...' : 'Upload .lib'}
+      </button>
+      {message && <div className="text-sm text-danger">{message}</div>}
+    </form>
+  );
+}
+
 export default function SettingsPage() {
   const { hasPermission } = useAuth();
   const [settings, setSettings] = useState(null);
@@ -91,8 +129,8 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 setting">
+      <div className="max-[768px]:flex-col max-[768px]:gap-[20px] flex min-[768px]:items-center justify-between">
         <h1 className="text-2xl font-bold text-white flex items-center gap-2">
           <Settings className="h-6 w-6" /> System Settings
         </h1>
@@ -112,21 +150,21 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold text-white mb-4">System Status</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-300 mb-2">System Status</label>
+              <label className="block text-sm  mb-2">System Status</label>
               <select
                 value={settings.system.status}
                 onChange={(e) => setSettings(prev => ({
                   ...prev,
                   system: { ...prev.system, status: e.target.value }
                 }))}
-                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
               >
                 <option value="on">Online</option>
                 <option value="off">Offline (Maintenance)</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-300 mb-2">Maintenance Message</label>
+              <label className="block text-sm  mb-2">Maintenance Message</label>
               <input
                 type="text"
                 value={settings.system.maintenanceMessage}
@@ -134,7 +172,7 @@ export default function SettingsPage() {
                   ...prev,
                   system: { ...prev.system, maintenanceMessage: e.target.value }
                 }))}
-                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
                 placeholder="System is under maintenance..."
               />
             </div>
@@ -142,10 +180,10 @@ export default function SettingsPage() {
         </div>
 
         {/* Function Toggles */}
-        <div className="bg-accent rounded-lg p-6 border border-none">
+        <div className="bg-accent rounded-lg p-6 border border-none toggle">
           <h2 className="text-lg font-semibold text-white mb-4">Function Toggles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center justify-between p-3 bg-[#181818] rounded">
+            <div className="flex items-center justify-between p-3 bg-[var(--label)] rounded">
               <span className="text-white">Online Mode</span>
               <button
                 type="button"
@@ -155,7 +193,7 @@ export default function SettingsPage() {
                 {settings.functions.online ? <ToggleRight className="h-4 w-4 text-white" /> : <ToggleLeft className="h-4 w-4 text-white" />}
               </button>
             </div>
-            <div className="flex items-center justify-between p-3 bg-[#181818] rounded">
+            <div className="flex items-center justify-between p-3 bg-[var(--label)] rounded">
               <span className="text-white">Bullet</span>
               <button
                 type="button"
@@ -165,7 +203,7 @@ export default function SettingsPage() {
                 {settings.functions.bullet ? <ToggleRight className="h-4 w-4 text-white" /> : <ToggleLeft className="h-4 w-4 text-white" />}
               </button>
             </div>
-            <div className="flex items-center justify-between p-3 bg-[#181818] rounded">
+            <div className="flex items-center justify-between p-3 bg-[var(--label)] rounded">
               <span className="text-white">Aimbot</span>
               <button
                 type="button"
@@ -175,7 +213,7 @@ export default function SettingsPage() {
                 {settings.functions.aimbot ? <ToggleRight className="h-4 w-4 text-white" /> : <ToggleLeft className="h-4 w-4 text-white" />}
               </button>
             </div>
-            <div className="flex items-center justify-between p-3 bg-[#181818] rounded">
+            <div className="flex items-center justify-between p-3 bg-[var(--label)] rounded">
               <span className="text-white">Memory</span>
               <button
                 type="button"
@@ -193,30 +231,30 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold text-white mb-4">General Settings</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm text-gray-300 mb-2">Mod Name</label>
+              <label className="block text-sm  mb-2">Mod Name</label>
               <input
                 type="text"
                 value={settings.modName}
                 onChange={(e) => setSettings(prev => ({ ...prev, modName: e.target.value }))}
-                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-300 mb-2">Currency</label>
+              <label className="block text-sm  mb-2">Currency</label>
               <input
                 type="text"
                 value={settings.functions.currency}
                 onChange={(e) => updateFunction('currency', e.target.value)}
-                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-300 mb-2">Maintenance Message</label>
+              <label className="block text-sm  mb-2">Maintenance Message</label>
               <input
                 type="text"
                 value={settings.functions.maintenance}
                 onChange={(e) => updateFunction('maintenance', e.target.value)}
-                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
               />
             </div>
           </div>
@@ -227,62 +265,63 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold text-white mb-4">Pricing</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
-              <label className="block text-sm text-gray-300 mb-2">1 Hour</label>
+              <label className="block text-sm  mb-2">1 Hour</label>
               <input
                 type="number"
                 value={settings.functions.prices.hr1}
                 onChange={(e) => updatePrice('hr1', e.target.value)}
-                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-300 mb-2">1 Day</label>
+              <label className="block text-sm  mb-2">1 Day</label>
               <input
                 type="number"
                 value={settings.functions.prices.days1}
                 onChange={(e) => updatePrice('days1', e.target.value)}
-                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-300 mb-2">3 Days</label>
+              <label className="block text-sm  mb-2">3 Days</label>
               <input
                 type="number"
                 value={settings.functions.prices.days3}
                 onChange={(e) => updatePrice('days3', e.target.value)}
-                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-300 mb-2">7 Days</label>
+              <label className="block text-sm  mb-2">7 Days</label>
               <input
                 type="number"
                 value={settings.functions.prices.days7}
                 onChange={(e) => updatePrice('days7', e.target.value)}
-                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-300 mb-2">30 Days</label>
+              <label className="block text-sm  mb-2">30 Days</label>
               <input
                 type="number"
                 value={settings.functions.prices.days30}
                 onChange={(e) => updatePrice('days30', e.target.value)}
-                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-300 mb-2">60 Days</label>
+              <label className="block text-sm  mb-2">60 Days</label>
               <input
                 type="number"
                 value={settings.functions.prices.days60}
                 onChange={(e) => updatePrice('days60', e.target.value)}
-                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
               />
             </div>
           </div>
         </div>
       </form>
+      {hasPermission(1) && <UploadLib />}
     </div>
   );
 } 

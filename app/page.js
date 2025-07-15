@@ -57,7 +57,7 @@ export default function LoginPage() {
             // Step 1: Username
             <form onSubmit={handleUsernameSubmit} className="space-y-6">
               <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-300">
+                <label htmlFor="username" className="block text-sm font-medium ">
                   Username
                 </label>
                 <div className="mt-1 relative">
@@ -98,7 +98,7 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+                <label htmlFor="password" className="block text-sm font-medium ">
                   Password
                 </label>
                 <div className="mt-1 relative">
@@ -121,9 +121,9 @@ export default function LoginPage() {
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300" />
+                      <EyeOff className="h-5 w-5 text-gray-400 hover:" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300" />
+                      <Eye className="h-5 w-5 text-gray-400 hover:" />
                     )}
                   </button>
                 </div>
@@ -133,7 +133,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="flex-1 py-3 px-4 border border-gray-600 text-sm font-medium rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+                  className="flex-1 py-3 px-4 border border-gray-600 text-sm font-medium rounded-md  bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
                 >
                   Back
                 </button>

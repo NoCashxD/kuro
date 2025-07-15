@@ -141,19 +141,19 @@ export default function UsersPage() {
           <form onSubmit={handleCreate} className="bg-accent p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-md space-y-4 border border-gray-700">
             <h2 className="text-lg font-semibold text-text mb-2">Create New User</h2>
             <div>
-              <label className="block text-sm text-gray-300">Full Name</label>
+              <label className="block text-sm ">Full Name</label>
               <input type="text" className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" required value={form.fullname} onChange={e => setForm(f => ({ ...f, fullname: e.target.value }))} />
             </div>
             <div>
-              <label className="block text-sm text-gray-300">Username</label>
+              <label className="block text-sm ">Username</label>
               <input type="text" className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" required value={form.username} onChange={e => setForm(f => ({ ...f, username: e.target.value }))} />
             </div>
             <div>
-              <label className="block text-sm text-gray-300">Password</label>
+              <label className="block text-sm ">Password</label>
               <input type="password" className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" required value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} />
             </div>
             <div>
-              <label className="block text-sm text-gray-300">Level</label>
+              <label className="block text-sm ">Level</label>
               <select className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" value={form.level} onChange={e => setForm(f => ({ ...f, level: Number(e.target.value) }))}>
                 {getAvailableLevels().map(level => (
                   <option key={level.value} value={level.value}>{level.label}</option>
@@ -161,11 +161,11 @@ export default function UsersPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-300">Balance (Saldo)</label>
+              <label className="block text-sm ">Balance (Saldo)</label>
               <input type="number" className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" value={form.saldo} onChange={e => setForm(f => ({ ...f, saldo: Number(e.target.value) }))} />
             </div>
             <div>
-              <label className="block text-sm text-gray-300">Expiration Date</label>
+              <label className="block text-sm ">Expiration Date</label>
               <input type="date" className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" value={form.expiration_date} onChange={e => setForm(f => ({ ...f, expiration_date: e.target.value }))} />
             </div>
             <div className="flex gap-2 mt-4">

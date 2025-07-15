@@ -88,18 +88,18 @@ export default function ReferralsPage() {
           <form onSubmit={handleCreate} className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md space-y-4 border border-gray-700">
             <h2 className="text-lg font-semibold text-white mb-2">Generate Referral Code</h2>
             <div>
-              <label className="block text-sm text-gray-300">User Level</label>
+              <label className="block text-sm ">User Level</label>
               <select className="w-full mt-1 p-2 rounded bg-gray-700 text-white border border-gray-600" value={form.level} onChange={e => setForm(f => ({ ...f, level: Number(e.target.value) }))}>
                 <option value={2}>Admin</option>
                 <option value={3}>Reseller</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-300">Initial Balance (Saldo)</label>
+              <label className="block text-sm ">Initial Balance (Saldo)</label>
               <input type="number" min={0} className="w-full mt-1 p-2 rounded bg-gray-700 text-white border border-gray-600" required value={form.set_saldo} onChange={e => setForm(f => ({ ...f, set_saldo: Number(e.target.value) }))} />
             </div>
             <div>
-              <label className="block text-sm text-gray-300">Account Expiration</label>
+              <label className="block text-sm ">Account Expiration</label>
               <input type="date" className="w-full mt-1 p-2 rounded bg-gray-700 text-white border border-gray-600" value={form.acc_expiration} onChange={e => setForm(f => ({ ...f, acc_expiration: e.target.value }))} />
             </div>
             <div className="flex gap-2 mt-4">

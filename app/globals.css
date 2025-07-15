@@ -2,12 +2,23 @@
 
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap');
 
+/* Theme variables */
+
 :root {
   --background: #000000;
   --text: #ffffff;
   --accent: #131313;
   --shadow: 0 2px 16px 0 rgba(0,0,0,0.7);
   --radius: 8px;
+  --label : #181818;
+}
+
+.bright{
+  --label : whitesmoke;
+  --background : #ececec;
+  --text : #131313;
+  --accent: white;
+  --svgtxt : white;
 }
 
 html, body {
@@ -15,7 +26,7 @@ html, body {
   margin: 0;
   padding: 0;
   background: var(--background);
-  color: var(--text);
+  color: var(--text) !important;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 16px;
   letter-spacing: 0.01em;
@@ -30,7 +41,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a {
-  color: #6cf;
   text-decoration: none;
 }
 a:hover {
@@ -51,22 +61,32 @@ button, .btn {
   color: var(--text);
   border: none;
   border-radius: var(--radius);
-  padding: 0.75rem 1.5rem;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.5);
+  
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  max-height: 48px;
 }
 button:hover, .btn:hover {
   background: #232323;
   color: #fff;
   box-shadow: 0 2px 12px 0 rgba(0,0,0,0.7);
 }
-
+.setting span , .spbl{
+  color: var(--text) !important;
+}
+span{
+  color: white !important;
+}
+.keys button, .transfer button, .setting button{
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.5);
+  
+  padding: 0.75rem 1.5rem;
+}
 input, textarea, select {
   font-family: 'IBM Plex Mono', monospace;
-  background: #181818;
+  background: var(--label);
   color: var(--text);
   border: 1px solid #232323;
   border-radius: var(--radius);
@@ -106,7 +126,12 @@ hr {
   border-top: 1px solid #232323;
   margin: 2rem 0;
 }
-
+.toggle svg{
+  color: var(--text);
+}
+.svgblack svg{
+  color: var(--svgtxt) !important;
+}
 /* Utility classes */
 .text-accent { color: #6cf; }
 .bg-accent { background: var(--accent); }

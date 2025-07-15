@@ -118,13 +118,13 @@ export default function DashboardPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-text">Dashboard</h1>
-        <p className="text-gray-300">
+        <p className="">
           Welcome back, {user.fullname}. Here's what's happening with your account.
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 svgblack">
         {statCards.map((card, index) => (
           <div key={index} className="bg-accent rounded shadow-card p-6">
             <div className="flex items-center">
@@ -132,14 +132,14 @@ export default function DashboardPage() {
                 <card.icon className="h-6 w-6 text-text" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-300">{card.title}</p>
+                <p className="text-sm font-medium ">{card.title}</p>
                 <p className="text-2xl font-bold text-text">{card.value}</p>
               </div>
             </div>
             <div className="mt-4 flex items-center">
               <TrendingUp className="h-4 w-4 text-green-500" />
               <span className="ml-1 text-sm text-green-500">{card.change}</span>
-              <span className="ml-2 text-sm text-gray-300">from last month</span>
+              <span className="ml-2 text-sm ">from last month</span>
             </div>
           </div>
         ))}
@@ -150,23 +150,23 @@ export default function DashboardPage() {
         <h2 className="text-lg font-semibold text-text mb-4">Account Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center">
-            <Users className="h-5 w-5 text-gray-300 mr-3" />
+            <Users className="h-5 w-5  mr-3" />
             <div>
-              <p className="text-sm text-gray-300">Role</p>
+              <p className="text-sm ">Role</p>
               <p className="text-text font-medium">{getRoleText()}</p>
             </div>
           </div>
           <div className="flex items-center">
-            <DollarSign className="h-5 w-5 text-gray-300 mr-3" />
+            <DollarSign className="h-5 w-5  mr-3" />
             <div>
-              <p className="text-sm text-gray-300">Balance</p>
+              <p className="text-sm ">Balance</p>
               <p className="text-text font-medium">${user.saldo}</p>
             </div>
           </div>
           <div className="flex items-center">
-            <Clock className="h-5 w-5 text-gray-300 mr-3" />
+            <Clock className="h-5 w-5  mr-3" />
             <div>
-              <p className="text-sm text-gray-300">Account Status</p>
+              <p className="text-sm ">Account Status</p>
               <p className="text-green-500 font-medium">Active</p>
             </div>
           </div>
@@ -181,7 +181,7 @@ export default function DashboardPage() {
             <div className="flex items-center">
               <div className={`w-3 h-3 rounded-full mr-3 ${stats.system.status === 'on' ? 'bg-green-500' : 'bg-red-500'}`}></div>
               <div>
-                <p className="text-sm text-gray-300">System</p>
+                <p className="text-sm ">System</p>
                 <p className={`font-medium ${stats.system.status === 'on' ? 'text-green-500' : 'text-red-500'}`}>
                   {stats.system.status === 'on' ? 'Online' : 'Offline'}
                 </p>
@@ -190,7 +190,7 @@ export default function DashboardPage() {
             <div className="flex items-center">
               <div className={`w-3 h-3 rounded-full mr-3 ${stats.system.functions.online ? 'bg-green-500' : 'bg-gray-500'}`}></div>
               <div>
-                <p className="text-sm text-gray-300">Online Mode</p>
+                <p className="text-sm ">Online Mode</p>
                 <p className={`font-medium ${stats.system.functions.online ? 'text-green-500' : 'text-gray-500'}`}>
                   {stats.system.functions.online ? 'Enabled' : 'Disabled'}
                 </p>
@@ -199,7 +199,7 @@ export default function DashboardPage() {
             <div className="flex items-center">
               <div className={`w-3 h-3 rounded-full mr-3 ${stats.system.functions.aimbot ? 'bg-green-500' : 'bg-gray-500'}`}></div>
               <div>
-                <p className="text-sm text-gray-300">Aimbot</p>
+                <p className="text-sm ">Aimbot</p>
                 <p className={`font-medium ${stats.system.functions.aimbot ? 'text-green-500' : 'text-gray-500'}`}>
                   {stats.system.functions.aimbot ? 'Enabled' : 'Disabled'}
                 </p>
@@ -208,7 +208,7 @@ export default function DashboardPage() {
             <div className="flex items-center">
               <div className={`w-3 h-3 rounded-full mr-3 ${stats.system.functions.memory ? 'bg-green-500' : 'bg-gray-500'}`}></div>
               <div>
-                <p className="text-sm text-gray-300">Memory</p>
+                <p className="text-sm ">Memory</p>
                 <p className={`font-medium ${stats.system.functions.memory ? 'text-green-500' : 'text-gray-500'}`}>
                   {stats.system.functions.memory ? 'Enabled' : 'Disabled'}
                 </p>
@@ -221,7 +221,7 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div className="bg-accent rounded shadow-card p-6">
         <h2 className="text-lg font-semibold text-text mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 !text-white">
           <a href="/dashboard/keys" className="flex items-center justify-center px-4 py-2 bg-purple-600 text-text rounded hover:bg-purple-700 transition-colors">
             <Key className="h-5 w-5 mr-2" />
             Generate Keys

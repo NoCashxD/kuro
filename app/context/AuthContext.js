@@ -149,4 +149,49 @@ export function useRole() {
     isReseller: user?.role === ROLES.RESELLER,
     isUser: user?.role === ROLES.USER,
   };
+}
+
+// Theme context for dark/light mode
+const ThemeContext = createContext();
+
+export function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState('dark');
+
+  useEffect(() => {
+    // On mount, check localStorage or system preference
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
+    if (saved) {
+      setTheme(saved);
+      document.documentElement.classList.toggle('dark', saved === 'dark');
+    } else {
+      // Default to dark
+      setTheme('dark');
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('theme', theme);
+      if (theme === 'dark') {
+        
+        document.documentElement.classList.remove('bright');
+      } else {
+        document.documentElement.classList.add('bright');
+        
+      }
+    }
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(t => (t === 'dark' ? 'light' : 'dark'));
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export function useTheme() {
+  return useContext(ThemeContext);
 } 

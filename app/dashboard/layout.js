@@ -13,14 +13,18 @@ import {
   X,
   BarChart3,
   FileText,
-  Shield
+  Shield,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useState } from 'react';
+import { useTheme } from '../context/AuthContext';
 
 export default function DashboardLayout({ children }) {
   const { user, loading, logout, isOwner, isAdmin, isDev } = useAuth();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -77,8 +81,7 @@ export default function DashboardLayout({ children }) {
       }`}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-accent flex-shrink-0">
           <div className="flex items-center">
-            <Shield className="h-8 w-8 text-blue-500" />
-            <span className="ml-2 text-xl font-bold text-text font-mono">Kuro Panel</span>
+            <span className="ml-2 text-xl font-bold text-text font-mono spbl">Kuro Panel</span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -99,7 +102,7 @@ export default function DashboardLayout({ children }) {
                   className={`group flex items-center px-3 py-2 text-sm font-medium rounded transition-colors font-mono ${
                     isActive
                       ? 'bg-blue-600 text-text shadow-card'
-                      : 'text-gray-300 hover:bg-[#232323] hover:text-text'
+                      : ' hover:bg-[#232323] hover:text-text'
                   }`}
                 >
                   <item.icon className="mr-3 h-5 w-5" />
@@ -133,7 +136,7 @@ export default function DashboardLayout({ children }) {
           </div>
           <button
             onClick={logout}
-            className="mt-3 w-full flex items-center px-3 py-2 text-sm font-medium text-gray-300 hover:bg-[#232323] hover:text-text rounded transition-colors font-mono"
+            className="mt-3 w-full flex items-center px-3 py-2 text-sm font-medium  hover:bg-[#232323] hover:text-text rounded transition-colors font-mono"
           >
             <LogOut className="mr-3 h-5 w-5" />
             Logout
@@ -142,7 +145,7 @@ export default function DashboardLayout({ children }) {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col lg:ml-0">
+      <div className="flex-1 flex flex-col lg:ml-0 ">
         {/* Top bar */}
         <div className="sticky top-0 z-10 bg-accent border-b border-accent w-full h-[64px]">
           <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
@@ -154,15 +157,21 @@ export default function DashboardLayout({ children }) {
             </button>
             <div className="flex-1" />
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-400 font-mono">
-                Welcome, {user.fullname}
-              </span>
+              
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-2 px-3 py-1 rounded bg-gray-700 text-text hover:bg-gray-600 border border-gray-600"
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                <span className="hidden sm:inline">{theme === 'dark' ? 'Light' : 'Dark'} Mode</span>
+              </button>
             </div>
           </div>
         </div>
 
         {/* Page content */}
-        <main className="p-4 sm:p-6 lg:p-8 font-mono">
+        <main className="p-4 sm:p-6 lg:p-8 font-mono mainfile">
           {children}
         </main>
       </div>

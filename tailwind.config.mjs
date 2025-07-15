@@ -1,6 +1,7 @@
 // tailwind.config.mjs
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     './app/**/*.{js,ts,jsx,tsx}',
     './pages/**/*.{js,ts,jsx,tsx}',
@@ -9,9 +10,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#000000',
-        text: '#FFFFFF',
-        accent: '#131313',
+        background: 'var(--background)',
+        accent: 'var(--accent)',
+        text: 'var(--text)',
+        primary: 'var(--primary)',
+        secondary: 'var(--secondary)',
+        border: 'var(--border)',
+        danger: 'var(--danger)',
+        success: 'var(--success)',
         gray: {
           900: '#131313',
           800: '#181818',

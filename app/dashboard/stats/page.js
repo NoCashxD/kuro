@@ -33,7 +33,7 @@ export default function StatsPage() {
       <h1 className="text-2xl font-bold text-text mb-4">Statistics</h1>
       <div className="bg-accent rounded shadow-card p-6">
         <h2 className="text-lg font-semibold text-text mb-2">Keys</h2>
-        <ul className="text-gray-300">
+        <ul className="">
           <li>Total: {stats.keys.total}</li>
           <li>Active: {stats.keys.active}</li>
           <li>Expired: {stats.keys.expired}</li>
@@ -48,7 +48,7 @@ export default function StatsPage() {
       </div>
       <div className="bg-accent rounded shadow-card p-6">
         <h2 className="text-lg font-semibold text-text mb-2">Users</h2>
-        <ul className="text-gray-300">
+        <ul className="">
           <li>Total: {stats.users.total}</li>
           <li>Active: {stats.users.active}</li>
           <li>Owners: {stats.users.byLevel.owners}</li>
@@ -58,11 +58,11 @@ export default function StatsPage() {
       </div>
       <div className="bg-accent rounded shadow-card p-6">
         <h2 className="text-lg font-semibold text-text mb-2">Recent Activity</h2>
-        <p className="text-gray-300">Recent actions (last 7 days): {stats.activity.recent}</p>
+        <p className="">Recent actions (last 7 days): {stats.activity.recent}</p>
       </div>
       <div className="bg-accent rounded shadow-card p-6">
         <h2 className="text-lg font-semibold text-text mb-2">System Status</h2>
-        <ul className="text-gray-300">
+        <ul className="">
           <li>Status: <span className={stats.system.status === 'on' ? 'text-green-400' : 'text-red-400'}>{stats.system.status === 'on' ? 'Online' : 'Offline'}</span></li>
           <li>Online: {stats.system.functions.online ? 'Enabled' : 'Disabled'}</li>
           <li>Bullet: {stats.system.functions.bullet ? 'Enabled' : 'Disabled'}</li>
