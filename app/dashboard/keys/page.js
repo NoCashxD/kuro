@@ -172,7 +172,7 @@ export default function KeysPage() {
 
       {/* Key Generation Modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 sm:px-0" onClick={()=>{setShowCreate(!showCreate)}}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 sm:px-0">
           <form onSubmit={handleCreate} className="bg-accent p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-md space-y-4 border border-gray-700 max-h-[85vh] overflow-scroll">
             <h2 className="text-lg font-semibold text-text mb-2">Generate Keys</h2>
             <div>
