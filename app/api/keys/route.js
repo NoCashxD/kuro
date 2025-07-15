@@ -3,6 +3,16 @@ import { withAuthRoleAndOwner } from '../../../lib/middleware.js';
 import { query } from '../../../lib/db.js';
 import { generateUniqueKey, logActivity, getUserOwnerHierarchy } from '../../../lib/auth.js';
 
+// Helper to generate random suffix
+function randomSuffix(length = 6) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 // Get all keys (with role-based filtering)
 async function getKeys(req) {
   try {
@@ -54,13 +64,11 @@ async function getKeys(req) {
 // Generate new keys
 async function generateKeys(data, currentUser) {
   try {
-    const { game, quantity = 1, duration, max_devices = 1 } = data;
-    
+    const { game, quantity = 1, duration, max_devices = 1, prefix = '', durationUnit = 'hours', trial = false } = data;
     // Validate required fields
     if (!game || !duration) {
       return NextResponse.json({ error: 'Game and duration are required' }, { status: 400 });
     }
-    
     // Determine owner based on current user
     let owner;
     if (currentUser.level === 1) {
@@ -68,31 +76,28 @@ async function generateKeys(data, currentUser) {
     } else {
       owner = currentUser.owner;
     }
-    
     const generatedKeys = [];
-    
-    // Generate multiple keys
+    // Calculate duration in hours
+    let durationHours = Number(duration);
+    if (durationUnit === 'days') {
+      durationHours = Number(duration) * 24;
+    }
+    // For trial key, force 1 hour
+    if (trial) {
+      durationHours = 1;
+    }
+    // Bulk generation
     for (let i = 0; i < quantity; i++) {
-      const userKey = generateUniqueKey();
+      const suffix = randomSuffix();
+      const userKey = `${prefix || 'KEY'}-${suffix}`;
       const expiredDate = new Date();
-      expiredDate.setHours(expiredDate.getHours() + duration);
-      
+      expiredDate.setHours(expiredDate.getHours() + durationHours);
       const result = await query(
         `INSERT INTO keys_code (game, user_key, duration, expired_date, max_devices, status, registrator, owner, created_at, updated_at) 
          VALUES (?, ?, ?, ?, ?, 1, ?, ?, NOW(), NOW())`,
-        [game, userKey, duration, expiredDate, max_devices, currentUser.username, owner]
+        [game, userKey, durationHours, expiredDate, max_devices, currentUser.username, owner]
       );
-      
-      generatedKeys.push({
-        id: result.insertId,
-        user_key: userKey,
-        game,
-        duration,
-        expired_date: expiredDate,
-        max_devices,
-        owner
-      });
-      
+      generatedKeys.push(userKey);
       // Log activity
       await logActivity(
         result.insertId.toString(),
@@ -101,7 +106,11 @@ async function generateKeys(data, currentUser) {
         owner
       );
     }
-    
+    // Deduct balance for Owners/Admins (except trial)
+    if (!trial && (currentUser.level === 1 || currentUser.level === 2)) {
+      const cost = quantity * durationHours; // Example: 1 saldo per hour per key
+      await query('UPDATE users SET saldo = saldo - ? WHERE username = ?', [cost, currentUser.username]);
+    }
     return NextResponse.json({
       success: true,
       message: `${quantity} key(s) generated successfully`,
@@ -116,37 +125,28 @@ async function generateKeys(data, currentUser) {
 // Bulk operations on keys
 async function bulkOperation(data, currentUser) {
   try {
-    const { operation, keyIds, extendHours = 1 } = data;
-    
+    const { operation, keyIds, extendHours = 1, extendUnit = 'hours' } = data;
     if (!operation || !keyIds || !Array.isArray(keyIds)) {
       return NextResponse.json({ error: 'Operation and key IDs are required' }, { status: 400 });
     }
-    
     // Resellers can't perform bulk operations
     if (currentUser.level === 3) {
       return NextResponse.json({ error: 'Insufficient permissions for bulk operations' }, { status: 403 });
     }
-    
     // Determine owner filter based on role
     let ownerFilter = '';
     let ownerParams = [];
-    
     if (currentUser.level === 0) {
-      // Dev can operate on all keys
       ownerFilter = '';
       ownerParams = [];
     } else if (currentUser.level === 1) {
-      // Owner can operate on their keys
       ownerFilter = 'AND owner = ?';
       ownerParams = [currentUser.username];
     } else if (currentUser.level === 2) {
-      // Admin can operate on their owner's keys
       ownerFilter = 'AND owner = ?';
       ownerParams = [currentUser.owner];
     }
-    
     let affectedRows = 0;
-    
     switch (operation) {
       case 'delete':
         const deleteResult = await query(
@@ -173,11 +173,18 @@ async function bulkOperation(data, currentUser) {
         break;
         
       case 'extend':
+        let interval = extendHours;
+        if (extendUnit === 'days') interval = extendHours * 24;
         const extendResult = await query(
           `UPDATE keys_code SET expired_date = DATE_ADD(expired_date, INTERVAL ? HOUR) WHERE id_keys IN (${keyIds.map(() => '?').join(',')}) ${ownerFilter}`,
-          [extendHours, ...keyIds, ...ownerParams]
+          [interval, ...keyIds, ...ownerParams]
         );
         affectedRows = extendResult.affectedRows;
+        // Deduct balance for Owners/Admins
+        if (currentUser.level === 1 || currentUser.level === 2) {
+          const cost = keyIds.length * interval; // Example: 1 saldo per hour per key
+          await query('UPDATE users SET saldo = saldo - ? WHERE username = ?', [cost, currentUser.username]);
+        }
         break;
         
       default:

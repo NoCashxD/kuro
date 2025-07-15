@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { ROLES, ROLE_LABELS } from '../../roles';
 
 const AuthContext = createContext();
 
@@ -135,4 +136,17 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
+}
+
+export function useRole() {
+  const { user } = useAuth();
+  return {
+    role: user?.role,
+    roleLabel: ROLE_LABELS[user?.role] || 'Unknown',
+    isMain: user?.role === ROLES.MAIN,
+    isOwner: user?.role === ROLES.OWNER,
+    isAdmin: user?.role === ROLES.ADMIN,
+    isReseller: user?.role === ROLES.RESELLER,
+    isUser: user?.role === ROLES.USER,
+  };
 } 

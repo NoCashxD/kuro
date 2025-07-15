@@ -188,6 +188,37 @@ async function deleteUser(req) {
   }
 }
 
+// Block owner and all sub-users/keys
+async function blockOwnerHierarchy(req) {
+  try {
+    const { ownerUsername } = await req.json();
+    const currentUser = req.user;
+    if (currentUser.level !== 0) {
+      return NextResponse.json({ error: 'Only Main can block an owner hierarchy' }, { status: 403 });
+    }
+    if (!ownerUsername) {
+      return NextResponse.json({ error: 'Owner username is required' }, { status: 400 });
+    }
+    // Block the owner
+    await query('UPDATE users SET status = 0 WHERE username = ?', [ownerUsername]);
+    // Block all sub-users
+    await query('UPDATE users SET status = 0 WHERE owner = ?', [ownerUsername]);
+    // Block all keys belonging to the owner
+    await query('UPDATE keys_code SET status = 0 WHERE owner = ?', [ownerUsername]);
+    // Log activity
+    await logActivity(
+      ownerUsername,
+      currentUser.username,
+      `Blocked owner and all sub-users/keys: ${ownerUsername}`,
+      ownerUsername
+    );
+    return NextResponse.json({ success: true, message: 'Owner and all sub-users/keys blocked.' });
+  } catch (error) {
+    console.error('Block owner hierarchy error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
 // Apply middleware and handle requests
 const handler = async (req) => {
   if (req.method === 'GET') {
@@ -206,3 +237,12 @@ const handler = async (req) => {
 export const GET = withAuthRoleAndOwner(2)(handler);
 export const POST = withAuthRoleAndOwner(2)(handler);
 export const DELETE = withAuthRoleAndOwner(2)(handler); 
+
+// Add a POST endpoint for blockOwnerHierarchy
+export async function POST(req) {
+  const url = req.nextUrl || req.url;
+  if (typeof url === 'string' ? url.includes('block-hierarchy') : url.pathname.includes('block-hierarchy')) {
+    return blockOwnerHierarchy(req);
+  }
+  // ...existing POST logic...
+} 

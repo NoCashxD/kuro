@@ -47,6 +47,9 @@ export default function DashboardLayout({ children }) {
     { name: 'Statistics', href: '/dashboard/stats', icon: BarChart3, level: 2 },
     { name: 'History', href: '/dashboard/history', icon: FileText, level: 2 },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings, level: 1 },
+    // New: Balance Transfer (Owner/Admin only)
+    ...(user.level <= 2 ? [{ name: 'Transfer Balance', href: '/dashboard/users/transfer-balance', icon: Key, level: 2 }] : []),
+    // Removed: Owner Server Link (feature deleted)
   ].filter(item => user.level <= item.level);
 
   const getRoleBadge = () => {
@@ -59,17 +62,17 @@ export default function DashboardLayout({ children }) {
   const roleBadge = getRoleBadge();
 
   return (
-    <div className="min-h-screen bg-background flex font-mono">
+    <div className="min-h-screen bg-background min-[768px]:flex font-mono">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-black bg-opacity-70 lg:hidden"
+          className="fixed inset-0 z-40 bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-70 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`sticky inset-y-0 left-0 z-50 w-64 bg-accent flex flex-col h-screen transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:inset-0 ${
+      <div className={`max-[768px]:fixed sticky inset-y-0 left-0 z-50 w-64 bg-accent flex flex-col h-screen transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:inset-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-accent flex-shrink-0">

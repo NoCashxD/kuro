@@ -108,7 +108,7 @@ export default function SettingsPage() {
 
       <form onSubmit={handleSave} className="space-y-8">
         {/* System Status */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div className="bg-accent rounded-lg p-6 border border-none">
           <h2 className="text-lg font-semibold text-white mb-4">System Status</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -119,7 +119,7 @@ export default function SettingsPage() {
                   ...prev,
                   system: { ...prev.system, status: e.target.value }
                 }))}
-                className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
               >
                 <option value="on">Online</option>
                 <option value="off">Offline (Maintenance)</option>
@@ -134,7 +134,7 @@ export default function SettingsPage() {
                   ...prev,
                   system: { ...prev.system, maintenanceMessage: e.target.value }
                 }))}
-                className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
                 placeholder="System is under maintenance..."
               />
             </div>
@@ -142,10 +142,10 @@ export default function SettingsPage() {
         </div>
 
         {/* Function Toggles */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div className="bg-accent rounded-lg p-6 border border-none">
           <h2 className="text-lg font-semibold text-white mb-4">Function Toggles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center justify-between p-3 bg-gray-700 rounded">
+            <div className="flex items-center justify-between p-3 bg-[#181818] rounded">
               <span className="text-white">Online Mode</span>
               <button
                 type="button"
@@ -155,7 +155,7 @@ export default function SettingsPage() {
                 {settings.functions.online ? <ToggleRight className="h-4 w-4 text-white" /> : <ToggleLeft className="h-4 w-4 text-white" />}
               </button>
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-700 rounded">
+            <div className="flex items-center justify-between p-3 bg-[#181818] rounded">
               <span className="text-white">Bullet</span>
               <button
                 type="button"
@@ -165,7 +165,7 @@ export default function SettingsPage() {
                 {settings.functions.bullet ? <ToggleRight className="h-4 w-4 text-white" /> : <ToggleLeft className="h-4 w-4 text-white" />}
               </button>
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-700 rounded">
+            <div className="flex items-center justify-between p-3 bg-[#181818] rounded">
               <span className="text-white">Aimbot</span>
               <button
                 type="button"
@@ -175,7 +175,7 @@ export default function SettingsPage() {
                 {settings.functions.aimbot ? <ToggleRight className="h-4 w-4 text-white" /> : <ToggleLeft className="h-4 w-4 text-white" />}
               </button>
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-700 rounded">
+            <div className="flex items-center justify-between p-3 bg-[#181818] rounded">
               <span className="text-white">Memory</span>
               <button
                 type="button"
@@ -189,7 +189,7 @@ export default function SettingsPage() {
         </div>
 
         {/* General Settings */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div className="bg-accent rounded-lg p-6 border border-none">
           <h2 className="text-lg font-semibold text-white mb-4">General Settings</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -198,7 +198,7 @@ export default function SettingsPage() {
                 type="text"
                 value={settings.modName}
                 onChange={(e) => setSettings(prev => ({ ...prev, modName: e.target.value }))}
-                className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
               />
             </div>
             <div>
@@ -207,7 +207,7 @@ export default function SettingsPage() {
                 type="text"
                 value={settings.functions.currency}
                 onChange={(e) => updateFunction('currency', e.target.value)}
-                className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
               />
             </div>
             <div>
@@ -216,14 +216,14 @@ export default function SettingsPage() {
                 type="text"
                 value={settings.functions.maintenance}
                 onChange={(e) => updateFunction('maintenance', e.target.value)}
-                className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
               />
             </div>
           </div>
         </div>
 
         {/* Pricing */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <div className="bg-accent rounded-lg p-6 border border-none">
           <h2 className="text-lg font-semibold text-white mb-4">Pricing</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
@@ -232,7 +232,7 @@ export default function SettingsPage() {
                 type="number"
                 value={settings.functions.prices.hr1}
                 onChange={(e) => updatePrice('hr1', e.target.value)}
-                className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
               />
             </div>
             <div>
@@ -241,7 +241,7 @@ export default function SettingsPage() {
                 type="number"
                 value={settings.functions.prices.days1}
                 onChange={(e) => updatePrice('days1', e.target.value)}
-                className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
               />
             </div>
             <div>
@@ -250,7 +250,7 @@ export default function SettingsPage() {
                 type="number"
                 value={settings.functions.prices.days3}
                 onChange={(e) => updatePrice('days3', e.target.value)}
-                className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
               />
             </div>
             <div>
@@ -259,7 +259,7 @@ export default function SettingsPage() {
                 type="number"
                 value={settings.functions.prices.days7}
                 onChange={(e) => updatePrice('days7', e.target.value)}
-                className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
               />
             </div>
             <div>
@@ -268,7 +268,7 @@ export default function SettingsPage() {
                 type="number"
                 value={settings.functions.prices.days30}
                 onChange={(e) => updatePrice('days30', e.target.value)}
-                className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
               />
             </div>
             <div>
@@ -277,7 +277,7 @@ export default function SettingsPage() {
                 type="number"
                 value={settings.functions.prices.days60}
                 onChange={(e) => updatePrice('days60', e.target.value)}
-                className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[#181818] text-white border border-gray-600"
               />
             </div>
           </div>

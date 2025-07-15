@@ -3,8 +3,21 @@ import { query } from '../../../lib/db.js';
 import { CONNECT_API_STATIC } from '../../../lib/auth.js';
 import CryptoJS from 'crypto-js';
 
+// Helper to extract ownername from dynamic route
+function getOwnerFromUrl(req) {
+  // For Next.js API routes, req.url contains the full URL
+  const url = req.nextUrl || req.url;
+  // Match /connect/[ownername] or /api/connect/[ownername]
+  const match = url.match(/\/connect\/?([^/]+)/) || url.match(/\/api\/connect\/?([^/]+)/);
+  return match ? match[1] : null;
+}
+
 async function handleConnect(req) {
   try {
+    const ownername = getOwnerFromUrl(req);
+    if (!ownername) {
+      return NextResponse.json({ error: 'Owner not specified in URL' }, { status: 400 });
+    }
     // Parse form data (matching C++ client format)
     const formData = await req.formData();
     const game = formData.get('game');
@@ -26,10 +39,10 @@ async function handleConnect(req) {
       return NextResponse.json({}, { status: 200 });
     }
 
-    // Find the key
+    // Find the key and check owner
     const keys = await query(
-      'SELECT * FROM keys_code WHERE user_key = ? AND game = ? AND status = 1',
-      [userKey, game]
+      'SELECT * FROM keys_code WHERE user_key = ? AND game = ? AND status = 1 AND owner = ?',
+      [userKey, game, ownername]
     );
     console.log('Key lookup result:', keys);
 

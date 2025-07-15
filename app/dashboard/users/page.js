@@ -35,10 +35,11 @@ export default function UsersPage() {
     e.preventDefault();
     setCreating(true);
     try {
-      const res = await fetch('/api/users', {
+      const payload = { ...form };
+      const res = await fetch('/api/users/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.success) {
@@ -136,8 +137,8 @@ export default function UsersPage() {
 
       {/* Create User Modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-          <form onSubmit={handleCreate} className="bg-accent p-8 rounded-lg shadow-lg w-full max-w-md space-y-4 border border-gray-700">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-2 sm:p-0">
+          <form onSubmit={handleCreate} className="bg-accent p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-md space-y-4 border border-gray-700">
             <h2 className="text-lg font-semibold text-text mb-2">Create New User</h2>
             <div>
               <label className="block text-sm text-gray-300">Full Name</label>
@@ -178,7 +179,7 @@ export default function UsersPage() {
       )}
 
       {/* Users Table */}
-      <div className="overflow-x-auto rounded-lg border border-gray-700">
+      <div className="overflow-x-auto rounded-lg border border-gray-700 mt-4">
         <table className="min-w-full bg-accent text-text">
           <thead>
             <tr>
