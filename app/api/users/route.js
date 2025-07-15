@@ -235,14 +235,11 @@ const handler = async (req) => {
 // Apply authentication and role-based access control
 // Level 2 (Admin) and above can manage users
 export const GET = withAuthRoleAndOwner(2)(handler);
-export const POST = withAuthRoleAndOwner(2)(handler);
-export const DELETE = withAuthRoleAndOwner(2)(handler); 
-
-// Add a POST endpoint for blockOwnerHierarchy
-export async function POST(req) {
+export const POST = withAuthRoleAndOwner(2)(async (req, context) => {
   const url = req.nextUrl || req.url;
   if (typeof url === 'string' ? url.includes('block-hierarchy') : url.pathname.includes('block-hierarchy')) {
     return blockOwnerHierarchy(req);
   }
-  // ...existing POST logic...
-} 
+  return handler(req, context);
+});
+export const DELETE = withAuthRoleAndOwner(2)(handler); 
