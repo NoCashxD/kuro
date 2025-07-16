@@ -214,10 +214,7 @@ export default function KeysPage() {
                 <select className="w-full p-2 rounded bg-gray-700 text-text border border-gray-600" required value={form.duration} onChange={e => setForm(f => ({ ...f, duration: Number(e.target.value) }))}>
                   {DURATION_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                 </select>
-                <select className="p-2 rounded bg-gray-700 text-text border border-gray-600" value={durationUnit} onChange={e => setDurationUnit(e.target.value)}>
-                  <option value="hours">Hours</option>
-                  <option value="days">Days</option>
-                </select>
+              
               </div>
             </div>
             <div>
@@ -291,27 +288,27 @@ export default function KeysPage() {
  <div className="flex justify-end mt-2 w-full">
         <input
           type="text"
-          className="w-full p-2 rounded bg-gray-700 text-text border border-gray-600  !mt-[10px] mx-0"
-          placeholder="Search keys, game, or owner..."
+          className="w-full p-2 rounded bg-[var(--label)] text-text logout !border-none  !mt-[10px] mx-0"
+          placeholder="Search keys......"
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
       </div>
       {/* Keys Table */}
-      <div className="overflow-x-auto rounded-lg border border-gray-700" style={{ scrollbarWidth : "none"}}>
+      <div className="overflow-x-auto rounded-lg logout" style={{ scrollbarWidth : "none"}}>
         <table className="min-w-full bg-accent text-text text-xs sm:text-sm w-max"  >
           <thead>
             <tr>
               {user.level < 3 && <th className="px-2 sm:px-4 py-2">Select</th>}
-              <th className="px-2 sm:px-4 py-2 text-left">Key</th>
-              <th className="px-2 sm:px-4 py-2 text-left">Game</th>
-              <th className="px-2 sm:px-4 py-2 text-left">Duration</th>
-              <th className="px-2 sm:px-4 py-2 text-left">Expiry Date</th>
-              <th className="px-2 sm:px-4 py-2 text-left">Max Devices</th>
-              <th className="px-2 sm:px-4 py-2 text-left">Status</th>
-              <th className="px-2 sm:px-4 py-2 text-left">Owner</th>
-              <th className="px-2 sm:px-4 py-2 text-left">Role</th>
-              <th className="px-2 sm:px-4 py-2 text-left">Created</th>
+              <th className="px-2 sm:px-4 py-2 ">Key</th>
+              <th className="px-2 sm:px-4 py-2 ">Game</th>
+              <th className="px-2 sm:px-4 py-2 ">Duration</th>
+              <th className="px-2 sm:px-4 py-2 ">Expiry Date</th>
+              <th className="px-2 sm:px-4 py-2 ">Max Devices</th>
+              <th className="px-2 sm:px-4 py-2 ">Status</th>
+              <th className="px-2 sm:px-4 py-2 ">Owner</th>
+              <th className="px-2 sm:px-4 py-2 ">Role</th>
+              <th className="px-2 sm:px-4 py-2 ">Created</th>
             </tr>
           </thead>
           <tbody>
@@ -327,9 +324,9 @@ export default function KeysPage() {
               </tr>
             ) : (
               keys.map((k, i) => (
-                <tr key={k.id} className="border-t border-gray-700">
+                <tr key={k.id} className="text-center w-max" style={{borderBottom : ".1px solid var(--border-table)"}}>
                   {user.level < 3 && <td className="px-2 sm:px-4 py-2"><input type="checkbox" checked={selected.includes(k.id)} onChange={() => toggleSelect(k.id)} className="accent-gray-600 dark:accent-purple-600" /></td>}
-                  <td className="px-2 sm:px-4 py-2 font-mono text-xs break-all max-w-[120px] sm:max-w-none">{k.user_key}</td>
+                  <td className="px-2 sm:px-4 py-2  text-xs break-all max-w-[120px] sm:max-w-none">{k.user_key}</td>
                   <td className="px-2 sm:px-4 py-2">{k.game}</td>
                   <td className="px-2 sm:px-4 py-2">{k.duration}h</td>
                   <td className="px-2 sm:px-4 py-2 text-xs">{k.expired_date ? (new Date(k.expired_date).toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })) : '-'}</td>
@@ -341,7 +338,7 @@ export default function KeysPage() {
                       <span className="inline-flex items-center gap-1 !text-red-400"><XCircle className="h-4 w-4" /> Inactive</span>
                     )}
                   </td>
-                  <td className="px-2 sm:px-4 py-2 font-mono">{k.owner}</td>
+                  <td className="px-2 sm:px-4 py-2 ">{k.owner}</td>
                   <td className="px-2 sm:px-4 py-2">{ROLE_LABELS[k.role] || 'User'}</td>
                   <td className="px-2 sm:px-4 py-2 text-xs">{k.created_at?.slice(0, 10)}</td>
                 </tr>

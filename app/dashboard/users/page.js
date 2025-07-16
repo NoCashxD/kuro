@@ -179,8 +179,8 @@ export default function UsersPage() {
       )}
 
       {/* Users Table */}
-      <div className="overflow-x-auto rounded-lg border border-gray-700 mt-4" style={{ scrollbarWidth : "none"}}>
-        <table className="min-w-full bg-accent text-text">
+      <div className="overflow-x-auto rounded-lg  mt-4  max-[768px]:!text-[12px] " style={{ scrollbarWidth : "none"}}>
+        <table className="min-w-full bg-accent text-text w-max">
           <thead>
             <tr>
               <th className="px-4 py-2 text-left">#</th>
@@ -207,9 +207,9 @@ export default function UsersPage() {
               </tr>
             ) : (
               users.map((u, i) => (
-                <tr key={u.id} className="border-t border-gray-700">
+                <tr key={u.id} className="">
                   <td className="px-4 py-2">{i + 1}</td>
-                  <td className="px-4 py-2 font-mono">{u.username}</td>
+                  <td className="px-4 py-2 ">{u.username}</td>
                   <td className="px-4 py-2">{u.fullname}</td>
                   <td className="px-4 py-2">{levelLabel(u.level)}</td>
                   <td className="px-4 py-2">
@@ -220,7 +220,7 @@ export default function UsersPage() {
                     )}
                   </td>
                   <td className="px-4 py-2">${u.saldo}</td>
-                  <td className="px-4 py-2 font-mono">
+                  <td className="px-4 py-2 ">
                     {u.owner}
                   </td>
                   <td className="px-4 py-2 text-xs">

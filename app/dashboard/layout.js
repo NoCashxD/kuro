@@ -71,7 +71,7 @@ export default function DashboardLayout({ children }) {
   const roleBadge = getRoleBadge();
 
   return (
-    <div className="min-h-screen bg-background min-[1024px]:flex font-mono">
+    <div className="min-h-screen bg-background min-[1024px]:flex ">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
@@ -86,7 +86,7 @@ export default function DashboardLayout({ children }) {
       }`}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-accent flex-shrink-0">
           <div className="flex items-center">
-            <span className="ml-2 text-xl font-bold text-text font-mono spbl">Kuro Panel</span>
+            <span className="ml-2 text-xl font-bold text-text  spbl">Kuro Panel</span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -107,7 +107,7 @@ export default function DashboardLayout({ children }) {
                     href={item.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`group flex items-center px-3 py-2 text-sm font-medium rounded transition-colors font-mono hover:bg-[#232323] hover:text-text`}
+                    className={`group flex items-center px-3 py-2 text-sm font-medium rounded transition-colors  hover:bg-[#232323] hover:text-text`}
                     onClick={() => setSidebarOpen(false)}
                   >
                     <item.icon className="mr-3 h-5 w-5" />
@@ -119,7 +119,7 @@ export default function DashboardLayout({ children }) {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`group flex items-center px-3 py-2 text-sm font-medium rounded transition-colors font-mono ${
+                  className={`group flex items-center px-3 py-2 text-sm font-medium rounded transition-colors  ${
                     isActive
                       ? 'bg-blue-600 text-white shadow-card'
                       : ' hover:bg-[#232323] hover:text-text'
@@ -134,22 +134,22 @@ export default function DashboardLayout({ children }) {
           </div>
         </nav>
         {/* User info stays at the bottom */}
-        <div className="p-4 border-t border-accent flex-shrink-0">
+        <div className="p-4 flex-shrink-0">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="h-8 w-8 bg-[#232323] rounded-full flex items-center justify-center">
-                <span className="text-sm font-medium text-text font-mono">
+                <span className="text-sm font-medium text-text ">
                   {user.username.charAt(0).toUpperCase()}
                 </span>
               </div>
             </div>
             <div className="ml-3 flex-1">
-              <p className="text-sm font-medium text-text font-mono">{user.fullname}</p>
+              <p className="text-sm font-medium text-text ">{user.fullname}</p>
               <div className="flex items-center mt-1">
                 <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${roleBadge.color} text-text`}>
                   {roleBadge.text}
                 </span>
-                <span className="ml-2 text-xs text-gray-400 font-mono">
+                <span className="ml-2 text-xs text-gray-400 ">
                   Saldo: ${user.saldo}
                 </span>
               </div>
@@ -157,7 +157,7 @@ export default function DashboardLayout({ children }) {
           </div>
           <button
             onClick={logout}
-            className="mt-3 w-full flex items-center px-3 py-2 text-sm font-medium  hover:bg-[#232323] hover:text-text rounded transition-colors font-mono"
+            className="logout mt-3 w-full flex items-center px-3 py-2 text-sm font-medium  hover:bg-[#232323] hover:text-text rounded transition-colors "
           >
             <LogOut className="mr-3 h-5 w-5" />
             Logout
@@ -168,7 +168,7 @@ export default function DashboardLayout({ children }) {
       {/* Main content */}
       <div className="flex-1 flex flex-col lg:ml-0 ">
         {/* Top bar */}
-        <div className="sticky top-0 z-10 bg-accent border-b border-accent w-full h-[64px]">
+        <div className="sticky top-0 z-10 bg-accent shadow-[0_1px_1px_0_rgba(0,0,0,0.4)] border-[var(--label)] w-full h-[64px]">
           <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -192,7 +192,7 @@ export default function DashboardLayout({ children }) {
         </div>
 
         {/* Page content */}
-        <main className="p-4 sm:p-6 lg:p-8 font-mono mainfile">
+        <main className="p-4 sm:p-6 lg:p-8  mainfile">
           {children}
         </main>
       </div>

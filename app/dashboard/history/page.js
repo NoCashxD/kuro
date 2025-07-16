@@ -150,10 +150,10 @@ export default function HistoryPage() {
               filteredHistory.map((item, i) => (
                 <tr key={item.id} className="border-t border-accent/30 hover:bg-accent/20 transition-colors">
                   <td className="px-4 py-3">{(pagination.page - 1) * pagination.limit + i + 1}</td>
-                  <td className="px-4 py-3 font-mono text-white">{item.user_do}</td>
+                  <td className="px-4 py-3  text-white">{item.user_do}</td>
                   <td className="px-4 py-3">{item.info}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-white/80">{item.keys_id || '-'}</td>
-                  <td className="px-4 py-3 font-mono text-white">{item.owner}</td>
+                  <td className="px-4 py-3  text-xs text-white/80">{item.keys_id || '-'}</td>
+                  <td className="px-4 py-3  text-white">{item.owner}</td>
                   <td className="px-4 py-3 text-xs text-white/80">{formatDate(item.created_at)}</td>
                 </tr>
               ))

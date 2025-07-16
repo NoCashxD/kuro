@@ -109,12 +109,11 @@ async function generateKeys(data, currentUser) {
         const suffix = randomSuffix();
         userKey = `${prefix || 'KEY'}-${suffix}`;
       }
-      const expiredDate = new Date();
-      expiredDate.setHours(expiredDate.getHours() + durationHours);
+      // Set expired_date to NULL for new keys
       const result = await query(
         `INSERT INTO keys_code (game, user_key, duration, expired_date, max_devices, status, registrator, owner, created_at, updated_at) 
-         VALUES (?, ?, ?, ?, ?, 1, ?, ?, NOW(), NOW())`,
-        [game, userKey, durationHours, expiredDate, max_devices, currentUser.username, owner]
+         VALUES (?, ?, ?, NULL, ?, 1, ?, ?, NOW(), NOW())`,
+        [game, userKey, durationHours, max_devices, currentUser.username, owner]
       );
       generatedKeys.push(userKey);
       // Log activity
@@ -194,8 +193,9 @@ async function bulkOperation(data, currentUser) {
       case 'extend':
         let interval = extendHours;
         if (extendUnit === 'days') interval = extendHours * 24;
+        // Only extend keys that have a non-NULL expired_date (i.e., have been used)
         const extendResult = await query(
-          `UPDATE keys_code SET expired_date = DATE_ADD(expired_date, INTERVAL ? HOUR) WHERE id_keys IN (${keyIds.map(() => '?').join(',')}) ${ownerFilter}`,
+          `UPDATE keys_code SET expired_date = DATE_ADD(expired_date, INTERVAL ? HOUR) WHERE id_keys IN (${keyIds.map(() => '?').join(',')}) AND expired_date IS NOT NULL ${ownerFilter}`,
           [interval, ...keyIds, ...ownerParams]
         );
         affectedRows = extendResult.affectedRows;

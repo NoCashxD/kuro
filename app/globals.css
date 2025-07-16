@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* Theme variables */
 
@@ -11,14 +11,16 @@
   --shadow: 0 2px 16px 0 rgba(0,0,0,0.7);
   --radius: 8px;
   --label : #181818;
+  --border-table : #262626;
 }
 
 .bright{
   --label : whitesmoke;
-  --background : #ececec;
+  --background : #FAFAFA;
   --text : #131313;
   --accent: white;
   --svgtxt : white;
+  --border-table : #E5E5E5;
 }
 
 html, body {
@@ -27,14 +29,14 @@ html, body {
   padding: 0;
   background: var(--background);
   color: var(--text) !important;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Inter', sans-serif !important;
   font-size: 16px;
   letter-spacing: 0.01em;
   min-height: 100vh;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Inter', sans-serif;
   color: var(--text);
   font-weight: 700;
   margin-top: 0;
@@ -57,7 +59,7 @@ a:hover {
 }
 
 button, .btn {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Inter', sans-serif;
   background: var(--accent);
   color: var(--text);
   border: none;
@@ -77,6 +79,9 @@ button:hover, .btn:hover {
 .setting span , .spbl{
   color: var(--text) !important;
 }
+.logout{
+  box-shadow: 0 2px 6px 0 rgba(0,0,0,0.4);
+}
 span{
   color: white !important;
 }
@@ -86,7 +91,7 @@ span{
   padding: 0.75rem 1.5rem;
 }
 input, textarea, select {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Inter', sans-serif;
   background: var(--label);
   color: var(--text);
   border: 1px solid #232323;
@@ -100,7 +105,7 @@ input, textarea, select {
 
 
 pre, code {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Inter', sans-serif;
   background: #181818;
   color: #6cf;
   border-radius: var(--radius);

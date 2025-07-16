@@ -143,7 +143,7 @@ export default function ReferralsPage() {
               referrals.map((ref, i) => (
                 <tr key={ref.id} className="border-t border-gray-700">
                   <td className="px-4 py-2">{i + 1}</td>
-                  <td className="px-4 py-2 font-mono">{ref.code}</td>
+                  <td className="px-4 py-2 ">{ref.code}</td>
                   <td className="px-4 py-2">{levelLabel(ref.level)}</td>
                   <td className="px-4 py-2">${ref.set_saldo}</td>
                   <td className="px-4 py-2">
@@ -154,7 +154,7 @@ export default function ReferralsPage() {
                     )}
                   </td>
                   <td className="px-4 py-2">{ref.used_by || '-'}</td>
-                  <td className="px-4 py-2 font-mono">{ref.owner}</td>
+                  <td className="px-4 py-2 ">{ref.owner}</td>
                   <td className="px-4 py-2 text-xs">{ref.created_at?.slice(0, 10)}</td>
                   <td className="px-4 py-2">
                     <button

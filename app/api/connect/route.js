@@ -3,20 +3,17 @@ import { query } from '../../../lib/db.js';
 import { CONNECT_API_STATIC } from '../../../lib/auth.js';
 import CryptoJS from 'crypto-js';
 
-// Helper to extract ownername from dynamic route
-function getOwnerFromUrl(req) {
-  // For Next.js API routes, req.url contains the full URL
-  const url = req.nextUrl || req.url;
-  // Match /connect/[ownername] or /api/connect/[ownername]
-  const match = url.match(/\/connect\/?([^/]+)/) || url.match(/\/api\/connect\/?([^/]+)/);
-  return match ? match[1] : null;
-}
-
 async function handleConnect(req) {
   try {
-    const ownername = getOwnerFromUrl(req);
+    // Extract owner username from query string
+    const url = req.nextUrl || req.url;
+    let ownername = null;
+    if (url) {
+      const parsedUrl = typeof url === 'string' ? new URL(url, 'http://localhost') : url;
+      ownername = parsedUrl.searchParams ? parsedUrl.searchParams.get('username') : parsedUrl.searchParams.get('username');
+    }
     if (!ownername) {
-      return NextResponse.json({ error: 'Owner not specified in URL' }, { status: 400 });
+      return NextResponse.json({ error: 'Owner not specified in query' }, { status: 400 });
     }
     // Parse form data (matching C++ client format)
     const formData = await req.formData();
