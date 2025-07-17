@@ -26,7 +26,7 @@ export function LoginForm({
     e.preventDefault();
     if (!username.trim() || !password.trim()) return;
     setLoading(true);
-    await login(username.trim(), password);
+    await login(username.trim(), password, 2);
     setLoading(false);
   };
 
