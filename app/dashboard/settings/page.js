@@ -33,10 +33,10 @@ function UploadLib() {
 
   return (
     <form onSubmit={handleUpload} className="my-8 bg-accent p-6 rounded-lg !border-none !border-none-none flex flex-col gap-4">
-      <label className="block text-lg font-semibold text-text mb-2">Upload .lib file to FTP</label>
-      <input type="file" name="file" accept=".lib" required className="bg-background text-text rounded p-2 !border-none !border-none-!border-none" />
+      <label className="block text-lg font-semibold text-text mb-2">Upload .so file to FTP</label>
+      <input type="file" name="file" accept=".so" required className="bg-background text-text rounded p-2 !border-none !border-none-!border-none" />
       <button type="submit" disabled={uploading} className="w-fit px-4 py-2 bg-primary text-white rounded hover:bg-secondary">
-        {uploading ? 'Uploading...' : 'Upload .lib'}
+        {uploading ? 'Uploading...' : 'Upload .so'}
       </button>
       {message && <div className="text-sm text-danger">{message}</div>}
     </form>
@@ -123,7 +123,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="animate-spin h-8 w-8 text-purple-600" />
+        <Loader2 className="animate-spin h-8 w-8 text-text" />
       </div>
     );
   }
@@ -229,7 +229,7 @@ export default function SettingsPage() {
         {/* General Settings */}
         <div className="bg-accent rounded-lg p-6 !border-none !border-none-none">
           <h2 className="text-lg font-semibold text-white mb-4">General Settings</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm  mb-2">Mod Name</label>
               <input
@@ -248,15 +248,7 @@ export default function SettingsPage() {
                 className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
               />
             </div>
-            <div>
-              <label className="block text-sm  mb-2">Maintenance Message</label>
-              <input
-                type="text"
-                value={settings.functions.maintenance}
-                onChange={(e) => updateFunction('maintenance', e.target.value)}
-                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
-              />
-            </div>
+            
           </div>
         </div>
 

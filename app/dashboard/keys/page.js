@@ -21,6 +21,45 @@ const DURATION_OPTIONS = [
   { label: '60 Days', value: 1440 },
 ];
 
+function EditKeyModal({ keyData, onClose, onSave }) {
+  const [form, setForm] = useState({ ...keyData });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(f => ({ ...f, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(form);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 ">
+      <form onSubmit={handleSubmit} className="bg-accent p-6 rounded shadow-lg w-full max-w-md h-[95vh] overflow-y-scroll">
+        <h2 className="text-lg font-semibold mb-4">Edit Key</h2>
+        <label>Key</label>
+        <input name="user_key" value={form.user_key} onChange={handleChange} className="w-full mb-2" />
+        <label>Game</label>
+        <input name="game" value={form.game} onChange={handleChange} className="w-full mb-2" />
+        <label>Duration (hours)</label>
+        <input name="duration" type="number" value={form.duration} onChange={handleChange} className="w-full mb-2" />
+        <label>Expiry Date</label>
+        <input name="expired_date" value={form.expired_date ? form.expired_date : ""} onChange={handleChange} className="w-full mb-2" />
+        <label>Max Devices</label>
+        <input name="max_devices" type="number" value={form.max_devices} onChange={handleChange} className="w-full mb-2" />
+        <label>Owner</label>
+        <input name="owner" value={form.owner} onChange={handleChange} className="w-full mb-2" />
+        
+        <div className="flex gap-2 mt-4">
+          <button type="button" onClick={onClose} className="bg-gray-600 px-4 py-2 rounded text-white">Cancel</button>
+          <button type="submit" className="bg-blue-600 px-4 py-2 rounded text-white">Save</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
 export default function KeysPage() {
   const { hasPermission, user } = useAuth();
   const { role, isMain, isOwner, isAdmin, isReseller, isUser, roleLabel } = useRole();
@@ -38,6 +77,27 @@ export default function KeysPage() {
   const [useOnlyPrefix, setUseOnlyPrefix] = useState(false);
   const [search, setSearch] = useState('');
   const searchTimeout = useRef();
+  const [editingKey, setEditingKey] = useState(null);
+  const [showEdit, setShowEdit] = useState(false);
+  const [prices, setPrices] = useState({});
+  const [currency, setCurrency] = useState('$');
+
+  // Fetch prices and currency from settings
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const res = await fetch('/api/settings');
+        const data = await res.json();
+        if (data.success) {
+          setPrices(data.settings.functions.prices || {});
+          setCurrency(data.settings.functions.currency || '$');
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    fetchSettings();
+  }, []);
 
   useEffect(() => {
     fetchKeys();
@@ -117,6 +177,32 @@ export default function KeysPage() {
     }
   };
 
+  const handleKeyOperations = async (operation,id) => {
+   
+    
+    setBulkLoading(true);
+    try {
+      const body = { operation, keyIds: [id] };
+      if (operation === 'extend') body.extendHours = extendHours;
+      const res = await fetch('/api/keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`${operation} successful`);
+       
+        fetchKeys();
+      } else {
+        toast.error(data.error || 'Bulk operation failed');
+      }
+    } catch (e) {
+      toast.error('Bulk operation failed');
+    } finally {
+      setBulkLoading(false);
+    }
+  };
   const handleBulk = async (operation) => {
     if (selected.length === 0) return toast.error('Select at least one key');
     setBulkLoading(true);
@@ -142,7 +228,7 @@ export default function KeysPage() {
       setBulkLoading(false);
     }
   };
-
+  
   const handleCopyKeys = () => {
     if (generatedKeys.length > 0) {
       navigator.clipboard.writeText(generatedKeys.join('\n'));
@@ -165,6 +251,43 @@ export default function KeysPage() {
   const toggleSelect = (id) => {
     setSelected((prev) => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
+  const selectAll = (checked) => {
+    if (checked) {
+      // Select all
+      const allIds = keys.map(item => item.id);
+      setSelected(allIds);
+    } else {
+      // Deselect all
+      setSelected([]);
+    }
+  };
+  
+
+  const handleEditClick = (key) => {
+    setEditingKey(key);
+    setShowEdit(true);
+  };
+
+  const handleEditSave = async (updatedKey) => {
+    try {
+      const res = await fetch(`/api/keys/${updatedKey.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedKey),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Key updated');
+        setShowEdit(false);
+        setEditingKey(null);
+        fetchKeys();
+      } else {
+        toast.error(data.error || 'Failed to update key');
+      }
+    } catch (e) {
+      toast.error('Failed to update key');
+    }
+  };
 
   return (
     <div className="space-y-6 keys">
@@ -183,8 +306,8 @@ export default function KeysPage() {
 
       {/* Key Generation Modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 sm:px-0">
-          <form onSubmit={handleCreate} className="bg-accent p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-md space-y-4 border border-gray-700 max-h-[85vh] overflow-scroll"  style={{ scrollbarWidth : "none"}}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 sm:px-0 h-screen" style={{scrollbarWidth : "none"}}>
+          <form onSubmit={handleCreate} className="bg-accent p-6 rounded-lg shadow-lg w-full max-w-md max-h-[95vh] overflow-y-scroll">
             <h2 className="text-lg font-semibold text-text mb-2">Generate Keys</h2>
             <div>
               <label className="block text-sm ">Game</label>
@@ -193,47 +316,61 @@ export default function KeysPage() {
                 {GAME_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
               </select>
             </div>
-            <div>
-              <label className="block text-sm ">Custom Prefix</label>
-              <input type="text" className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" value={form.prefix} onChange={e => setForm(f => ({ ...f, prefix: e.target.value }))} maxLength={16} />
-              <span className="text-xs text-gray-400">Keys will be generated as {form.prefix}-XYZ123</span>
-            </div>
-            <div>
-              <label className="block text-sm ">Quantity</label>
-              <div className="flex justify-center gap-2 mb-2 flex-wrap">
-                {[3, 5, 10, 50, 100].map(q => (
-                  <button type="button" key={q} className={`px-2 py-1 rounded ${form.quantity === q ? 'bg-purple-700 text-white' : 'bg-gray-700 text-gray-200'}`} onClick={() => setForm(f => ({ ...f, quantity: q }))}>{q}</button>
-                ))}
-                <button type="button" className={`px-2 py-1 rounded ${form.quantity === 999 ? 'bg-purple-700 text-white' : 'bg-gray-700 text-gray-200'}`} onClick={() => setForm(f => ({ ...f, quantity: 999 }))}>Unlimited</button>
-              </div>
-              <input type="number" min={1} max={999} className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" required value={form.quantity} onChange={e => setForm(f => ({ ...f, quantity: Number(e.target.value) }))} />
-            </div>
+            
+            <label className="block text-sm ">Quantity</label>
+            <select
+              className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600"
+              value={form.quantity}
+              onChange={e => setForm(f => ({ ...f, quantity: Number(e.target.value) }))}
+              required
+            >
+              {[1, 3, 5, 10, 50, 100, 999].map(q => (
+                <option key={q} value={q}>{q === 999 ? 'Unlimited' : q}</option>
+              ))}
+            </select>
             <div>
               <label className="block text-sm ">Duration</label>
               <div className="flex justify-center gap-2 items-center mb-2">
                 <select className="w-full p-2 rounded bg-gray-700 text-text border border-gray-600" required value={form.duration} onChange={e => setForm(f => ({ ...f, duration: Number(e.target.value) }))}>
-                  {DURATION_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                  {DURATION_OPTIONS.map(opt => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label} / {currency}{prices[durationLabelToPriceKey(opt.label)] || '?'}
+                    </option>
+                  ))}
                 </select>
-              
               </div>
+            </div>
+            {/* Total price summary */}
+            <div className="text-right font-semibold text-[14px] mt-4 mb-2 dark:text-[whitesmoke] font-mono text-[#333]">
+              {(() => {
+                const priceKey = durationLabelToPriceKey(DURATION_OPTIONS.find(opt => opt.value === form.duration)?.label || '1 Hour');
+                const pricePerKey = Number(prices[priceKey]) || 1;
+                const total = form.quantity * pricePerKey;
+                return `Total = ${form.quantity} x ${currency}${pricePerKey} = ${currency}${total}`;
+              })()}
             </div>
             <div>
               <label className="block text-sm ">Max Devices</label>
-              <input type="number" min={1} max={10} className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" required value={form.max_devices} onChange={e => setForm(f => ({ ...f, max_devices: Number(e.target.value) }))} />
+              <input type="number" min={1} max={10} className="w-full mt-1 p-2 rounded bg-label !border-none text-text" required value={form.max_devices} onChange={e => setForm(f => ({ ...f, max_devices: Number(e.target.value) }))} />
             </div>
             <div>
+              <label className="block text-sm ">Custom Prefix</label>
+              <input type="text" className="w-full mt-1 p-2 rounded bg-label !border-none text-text" value={form.prefix} onChange={e => setForm(f => ({ ...f, prefix: e.target.value }))} maxLength={16} />
+              {/* <span className="text-xs text-gray-400">Keys will be generated as {form.prefix}-XYZ123</span> */}
+            </div>
+            <div className='flex items-center !mt-2 !my-4 '>
               <label className="inline-flex items-center gap-2 text-sm ">
-                <input type="checkbox" checked={useOnlyPrefix} onChange={e => setUseOnlyPrefix(e.target.checked)} className="accent-gray-600 dark:accent-purple-600" />
+                <input type="checkbox" checked={useOnlyPrefix} onChange={e => setUseOnlyPrefix(e.target.checked)} className="accent-gray-600 dark:accent-purple-600 !mb-0" />
                 Use only prefix as key (no random suffix)
               </label>
-              <span className="block text-xs !text-gray-400">If checked, keys will be exactly the prefix (e.g., RAMU, SHAM, DHAM)</span>
-            </div>
+              </div>
+           
             <div className="flex justify-center flex-col sm:flex-row gap-2 max-[768px]:mt-16 max-h-[48px] mb-2">
-              <button type="button" onClick={() => setShowCreate(false)} className="p-1 py-2 rounded bg-gray-600 text-text hover:bg-gray-700">Cancel</button>
-              <button type="submit" disabled={creating} className="p-1 py-2 rounded bg-purple-600 text-text hover:bg-purple-700 flex items-center justify-center">
+              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-3 rounded bg-gray-600 text-text hover:bg-gray-700">Cancel</button>
+              <button type="submit" disabled={creating} className="px-4 py-2 rounded bg-purple-600 text-text hover:bg-purple-700 flex items-center justify-center">
                 {creating ? <Loader2 className="animate-spin h-5 w-5" /> : 'Generate'}
               </button>
-              <button type="button" disabled={creating} onClick={handleTrial} className="p-1 !px-2 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center justify-center">1hr Trial</button>
+              <button type="button" disabled={creating} onClick={handleTrial} className="px-4 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center justify-center">1 Hr - Trial Key</button>
             </div>
           </form>
         </div>
@@ -243,21 +380,11 @@ export default function KeysPage() {
       
 
       {/* Bulk Actions */}
-      {user.level < 3 && (
+      {/* {user.level < 3 && (
         <div className="flex justify-between max-[768px]:w-[calc(100vw-32px)] min-[768px]:flex-wrap min-[768px]:gap-3 mb-2 overflow-x-scroll max-[768px]:p-[.65rem_0] bulky  max-[768px]:bg-[var(--label)] rounded max-[768px]:!text-[13px] " style={{ scrollbarWidth : "none"}}>
           <span className={`flex min-[768px]:gap-[16px] ${!generatedKeys.length > 0 && "!gap-3"} `}>
-            <button onClick={() => handleBulk('activate')} disabled={bulkLoading} className="px-3 py-2 rounded bg-green-600 text-text hover:bg-green-700 flex items-center gap-1 max-h-[48px]">
-              <CheckCircle className="h-4 w-4" />
-              <span className="hidden sm:inline spbl">Activate</span>
-            </button>
-            <button onClick={() => handleBulk('deactivate')} disabled={bulkLoading} className="px-3 py-2 rounded bg-yellow-600 text-text hover:bg-yellow-700 flex items-center gap-1 max-h-[48px]">
-              <XCircle className="h-4 w-4" />
-              <span className="hidden sm:inline spbl">Deactivate</span>
-            </button>
-            <button onClick={() => handleBulk('delete')} disabled={bulkLoading} className="px-3 py-2 rounded bg-red-600 text-text hover:bg-red-700 flex items-center gap-1 max-h-[48px]">
-              <Trash2 className="h-4 w-4" />
-              <span className="hidden sm:inline spbl">Delete</span>
-            </button>
+            
+            
             {generatedKeys.length > 0 && (
               <>
                 <button onClick={handleCopyKeys} className="flex justify-center items-center gap-2 px-4 py-2 bg-green-600 text-text rounded hover:bg-green-700">
@@ -273,7 +400,7 @@ export default function KeysPage() {
           </span>
           <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex justify-center items-center min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px] ">
             <input type="number" min={1} max={720} value={extendHours} onChange={e => setExtendHours(Number(e.target.value))} className="inp w-[126px] text-center px-4 py-1 !mb-0 rounded bg-gray-700 text-text max-h-[48px] max-[768px]:w-[50px] max-[768px]:h-[34px]" />
-            <select className="max-[768px]:!text-[13px] p-2 rounded bg-gray-700 text-text border border-gray-600 !mb-0 max-[768px]:h-[38px] " value={extendUnit} onChange={e => setExtendUnit(e.target.value)}>
+            <select className="max-[768px]:!text-[13px] p-2 rounded bg-gray-700 text-text !border-none !border-none-gray-600 !mb-0 max-[768px]:h-[38px] " value={extendUnit} onChange={e => setExtendUnit(e.target.value)}>
               <option className='text-[var(--text)]' value="hours">Hours</option>
               <option className='text-[var(--text)]' value="days">Days</option>
             </select>
@@ -283,23 +410,28 @@ export default function KeysPage() {
             </button>
           </form>
         </div>
-      )}
+      )} */}
  {/* Search Input */}
  <div className="flex justify-end mt-2 w-full">
         <input
           type="text"
-          className="w-full p-2 rounded bg-[var(--label)] text-text logout !border-none  !mt-[10px] mx-0"
+          className="w-full p-2 rounded bg-[var(--label)] text-text !border-none  !mt-[10px] mx-0 shadow-sm"
           placeholder="Search keys......"
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
       </div>
       {/* Keys Table */}
-      <div className="overflow-x-auto rounded-lg logout" style={{ scrollbarWidth : "none"}}>
+      <div className="overflow-x-auto rounded-lg shadow-sm" style={{ scrollbarWidth : "none"}}>
         <table className="min-w-full bg-accent text-text text-xs sm:text-sm w-max"  >
           <thead>
             <tr>
-              {user.level < 3 && <th className="px-2 sm:px-4 py-2">Select</th>}
+              {user.level < 3 && <th className="px-2 sm:px-4 py-2"> <input
+      type="checkbox"
+      checked={selected.length === keys.length && keys.length > 0}
+      onChange={(e) => selectAll(e.target.checked)}
+      className="accent-gray-600 dark:accent-purple-600"
+    /></th>}
               <th className="px-2 sm:px-4 py-2 ">Key</th>
               <th className="px-2 sm:px-4 py-2 ">Game</th>
               <th className="px-2 sm:px-4 py-2 ">Duration</th>
@@ -309,13 +441,14 @@ export default function KeysPage() {
               <th className="px-2 sm:px-4 py-2 ">Owner</th>
               <th className="px-2 sm:px-4 py-2 ">Role</th>
               <th className="px-2 sm:px-4 py-2 ">Created</th>
+              <th className="px-2 sm:px-4 py-2 ">Action</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
                 <td colSpan={9} className="text-center py-8">
-                  <Loader2 className="animate-spin h-6 w-6 mx-auto text-purple-500" />
+                  <Loader2 className="animate-spin h-6 w-6 mx-auto text-text" />
                 </td>
               </tr>
             ) : keys.length === 0 ? (
@@ -331,22 +464,56 @@ export default function KeysPage() {
                   <td className="px-2 sm:px-4 py-2">{k.duration}h</td>
                   <td className="px-2 sm:px-4 py-2 text-xs">{k.expired_date ? (new Date(k.expired_date).toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })) : '-'}</td>
                   <td className="px-2 sm:px-4 py-2">{k.max_devices}</td>
-                  <td className="px-2 sm:px-4 py-2">
-                    {k.status === 1 ? (
-                      <span className="inline-flex items-center gap-1 !text-green-400"><CheckCircle className="h-4 w-4" /> Active</span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 !text-red-400"><XCircle className="h-4 w-4" /> Inactive</span>
-                    )}
+                  <td className="px-2 sm:px-4 py-2 flex gap-3">
+                  <button onClick={() => {  handleKeyOperations('activate',k.id);}} disabled={bulkLoading} className="px-3 py-2 rounded bg-green-600 text-text hover:bg-green-700 flex items-center gap-1 max-h-[48px]">
+              <CheckCircle className="h-4 w-4" />
+              
+            </button>
+            <button onClick={() =>  { handleKeyOperations('deactivate',k.id)}} disabled={bulkLoading} className="px-3 py-2 rounded bg-yellow-600 text-text hover:bg-yellow-700 flex items-center gap-1 max-h-[48px]">
+              <XCircle className="h-4 w-4" />
+             
+            </button>
                   </td>
                   <td className="px-2 sm:px-4 py-2 ">{k.owner}</td>
                   <td className="px-2 sm:px-4 py-2">{ROLE_LABELS[k.role] || 'User'}</td>
                   <td className="px-2 sm:px-4 py-2 text-xs">{k.created_at?.slice(0, 10)}</td>
+                  <td className="px-2 sm:px-4 py-2 text-xs flex">
+                    <button onClick={() => handleKeyOperations('delete',k.id)} disabled={bulkLoading} className="px-3 py-2 rounded bg-red-600 text-text hover:bg-red-700 flex items-center gap-1 max-h-[48px]">
+              <Trash2 className="h-4 w-4" />
+             
+            </button>
+                   <button onClick={() => handleEditClick(k)} className="px-3 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center gap-1 max-h-[48px] ml-2">
+                     <Edit2 className="h-4 w-4" />
+                   
+                   </button>
+                  </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
+      {showEdit && editingKey && (
+        <EditKeyModal
+          keyData={editingKey}
+          onClose={() => setShowEdit(false)}
+          onSave={handleEditSave}
+        />
+      )}
     </div>
   );
+} 
+
+// Helper function to map duration label to price key
+function durationLabelToPriceKey(label) {
+  switch (label) {
+    case '1 Hour': return 'hr1';
+    case '2 Hours': return 'hr2';
+    case '5 Hours': return 'hr5';
+    case '1 Day': return 'days1';
+    case '7 Days': return 'days7';
+    case '30 Days': return 'days30';
+    case '60 Days': return 'days60';
+    default: return '';
+  }
 } 

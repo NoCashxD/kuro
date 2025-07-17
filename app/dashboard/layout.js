@@ -29,6 +29,7 @@ import {
   LogOut, 
   Menu, 
   X,
+  Home,
   BarChart3,
   FileText,
   Shield,
@@ -56,7 +57,7 @@ export default function DashboardLayout({ children }) {
   if (loading) {
     return (
       <div className="min-h-screen min-w-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--text)]"></div>
       </div>
     );
   }
@@ -91,14 +92,14 @@ export default function DashboardLayout({ children }) {
       <SidebarInset>
       <header
           className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
+          <div className="flex items-center gap-2 ">
             <SidebarTrigger/>
             <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="/dashboard">
-                    Main Menu
+                   <Home className="w-[1rem] h-[1rem]"/>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />

@@ -165,15 +165,15 @@ export function AppSidebar({
   const { user, loading, logout, isOwner, isAdmin, isDev } = useAuth();
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, level: 3 },
-    { name: 'Users', href: '/dashboard/users', icon: Users, level: 2 }, // Only Admin and above can see Users
-    { name: 'Keys', href: '/dashboard/keys', icon: Key, level: 3 },
-    { name: 'Statistics', href: '/dashboard/stats', icon: BarChart3, level: 2 },
+    { name: 'Manage Users', href: '/dashboard/users', icon: Users, level: 2 }, // Only Admin and above can see Users
+    { name: 'Generate Keys', href: '/dashboard/keys', icon: Key, level: 3 },
+    { name: 'Check Statistics', href: '/dashboard/stats', icon: BarChart3, level: 2 },
     { name: 'History', href: '/dashboard/history', icon: FileText, level: 2 },
     // New: Balance Transfer (Owner/Admin only)
     ...(user.level <= 2 ? [{ name: 'Transfer Balance', href: '/dashboard/users/transfer-balance', icon: Key, level: 2 }] : []),
     // File Manager (external link)
     { name: 'File Manager', href: 'https://keysgen.site/filemanager/', icon: Folder, level: 3, external: true },
-      { name: 'Settings', href: '/dashboard/settings', icon: Settings, level: 1 },
+      { name: 'Online Functions', href: '/dashboard/settings', icon: Settings, level: 1 },
   ].filter(item => user.level <= item.level);
   return (
     <Sidebar collapsible="icon" {...props}>

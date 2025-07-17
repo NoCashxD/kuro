@@ -11,8 +11,8 @@ export const POST = withAuthRoleAndOwner(1)(async (req) => {
 
     const formData = await req.formData();
     const file = formData.get('file');
-    if (!file || !file.name.endsWith('.lib')) {
-      return NextResponse.json({ error: 'Only .lib files are allowed' }, { status: 400 });
+    if (!file || !file.name.endsWith('.so')) {
+      return NextResponse.json({ error: 'Only .so files are allowed' }, { status: 400 });
     }
 
     // Read file as buffer

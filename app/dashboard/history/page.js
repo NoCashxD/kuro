@@ -137,7 +137,7 @@ export default function HistoryPage() {
             {loading ? (
               <tr>
                 <td colSpan={6} className="text-center py-8">
-                  <Loader2 className="animate-spin h-6 w-6 mx-auto text-white" />
+                  <Loader2 className="animate-spin h-6 w-6 mx-auto text-text" />
                 </td>
               </tr>
             ) : filteredHistory.length === 0 ? (

@@ -32,7 +32,7 @@ export function TeamSwitcher({
          
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:!shadow-[none] hover:!bg-[transparent]">
               <div
                 className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 <GalleryVerticalEnd className="size-4" />
@@ -49,7 +49,7 @@ export function TeamSwitcher({
             
             <button
                 onClick={toggleTheme}
-                className="flex items-center gap-2 px-3 py-1 rounded bg-gray-700 text-text hover:bg-gray-600 border border-gray-600 shadow-none group-data-[collapsible=icon]:hidden"
+                className="flex items-center gap-2 px-3 py-1 rounded bg-gray-700 text-text hover:bg-gray-600 border border-gray-600 shadow-none group-data-[collapsible=icon]:hidden hover:!shadow-sm"
                 aria-label="Toggle theme"
               >
                 {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}

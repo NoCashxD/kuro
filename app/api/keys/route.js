@@ -13,6 +13,21 @@ function randomSuffix(length = 6) {
   return result;
 }
 
+// Helper to map duration in hours to price key
+function getPriceKey(durationHours) {
+  switch (Number(durationHours)) {
+    case 1: return 'hr1';
+    case 2: return 'hr2';
+    case 5: return 'hr5';
+    case 24: return 'days1';
+    case 72: return 'days3';
+    case 168: return 'days7';
+    case 720: return 'days30';
+    case 1440: return 'days60';
+    default: return 'hr1';
+  }
+}
+
 // Get all keys (with role-based filtering)
 async function getKeys(req) {
   try {
@@ -83,6 +98,19 @@ async function generateKeys(data, currentUser) {
     if (!game || !duration) {
       return NextResponse.json({ error: 'Game and duration are required' }, { status: 400 });
     }
+    // Fetch prices and currency from function_code
+    const [functionCode] = await query('SELECT * FROM function_code LIMIT 1');
+    const prices = {
+      hr1: Number(functionCode.Hr1) || 1,
+      hr2: Number(functionCode.Hr2) || 2,
+      hr5: Number(functionCode.Hr5) || 5,
+      days1: Number(functionCode.Days1) || 1,
+      days3: Number(functionCode.Days3) || 2,
+      days7: Number(functionCode.Days7) || 4,
+      days30: Number(functionCode.Days30) || 8,
+      days60: Number(functionCode.Days60) || 12,
+    };
+    const currency = functionCode.Currency || '$';
     // Determine owner based on current user
     let owner;
     if (currentUser.level === 1) {
@@ -100,6 +128,9 @@ async function generateKeys(data, currentUser) {
     if (trial) {
       durationHours = 1;
     }
+    // Determine price per key
+    const priceKey = getPriceKey(durationHours);
+    const pricePerKey = prices[priceKey] || 1;
     // Bulk generation
     for (let i = 0; i < quantity; i++) {
       let userKey;
@@ -126,7 +157,7 @@ async function generateKeys(data, currentUser) {
     }
     // Deduct balance for Owners/Admins (except trial)
     if (!trial && (currentUser.level === 1 || currentUser.level === 2)) {
-      const cost = quantity * durationHours; // Example: 1 saldo per hour per key
+      const cost = quantity * pricePerKey;
       await query('UPDATE users SET saldo = saldo - ? WHERE username = ?', [cost, currentUser.username]);
     }
     return NextResponse.json({
