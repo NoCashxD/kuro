@@ -6,12 +6,13 @@
 
 :root {
   --background: black;
-  --text: #ffffff;
+  --text: white;
   --accent: #18181B;
   --shadow: 0 2px 16px 0 rgba(0,0,0,0.7);
   --radius: 8px;
   --label : #181818;
   --border-table : #262626;
+  --text_input : #FAFAFA;
 }
 
 .bright{
@@ -21,6 +22,7 @@
   --accent: white;
   --svgtxt : white;
   --border-table : #E5E5E5;
+  --text_input : #1d1d1d6c;
 }
 
 html, body {
