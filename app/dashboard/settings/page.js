@@ -32,9 +32,9 @@ function UploadLib() {
   };
 
   return (
-    <form onSubmit={handleUpload} className="my-8 bg-accent p-6 rounded-lg border border-none flex flex-col gap-4">
+    <form onSubmit={handleUpload} className="my-8 bg-accent p-6 rounded-lg !border-none !border-none-none flex flex-col gap-4">
       <label className="block text-lg font-semibold text-text mb-2">Upload .lib file to FTP</label>
-      <input type="file" name="file" accept=".lib" required className="bg-background text-text rounded p-2 border border-border" />
+      <input type="file" name="file" accept=".lib" required className="bg-background text-text rounded p-2 !border-none !border-none-!border-none" />
       <button type="submit" disabled={uploading} className="w-fit px-4 py-2 bg-primary text-white rounded hover:bg-secondary">
         {uploading ? 'Uploading...' : 'Upload .lib'}
       </button>
@@ -146,7 +146,7 @@ export default function SettingsPage() {
 
       <form onSubmit={handleSave} className="space-y-8">
         {/* System Status */}
-        <div className="bg-accent rounded-lg p-6 border border-none">
+        <div className="bg-accent rounded-lg p-6 !border-none !border-none-none">
           <h2 className="text-lg font-semibold text-white mb-4">System Status</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -157,7 +157,7 @@ export default function SettingsPage() {
                   ...prev,
                   system: { ...prev.system, status: e.target.value }
                 }))}
-                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
               >
                 <option value="on">Online</option>
                 <option value="off">Offline (Maintenance)</option>
@@ -172,7 +172,7 @@ export default function SettingsPage() {
                   ...prev,
                   system: { ...prev.system, maintenanceMessage: e.target.value }
                 }))}
-                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
                 placeholder="System is under maintenance..."
               />
             </div>
@@ -180,7 +180,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Function Toggles */}
-        <div className="bg-accent rounded-lg p-6 border border-none toggle">
+        <div className="bg-accent rounded-lg p-6 !border-none !border-none-none toggle">
           <h2 className="text-lg font-semibold text-white mb-4">Function Toggles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center justify-between p-3 bg-[var(--label)] rounded">
@@ -227,7 +227,7 @@ export default function SettingsPage() {
         </div>
 
         {/* General Settings */}
-        <div className="bg-accent rounded-lg p-6 border border-none">
+        <div className="bg-accent rounded-lg p-6 !border-none !border-none-none">
           <h2 className="text-lg font-semibold text-white mb-4">General Settings</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -236,7 +236,7 @@ export default function SettingsPage() {
                 type="text"
                 value={settings.modName}
                 onChange={(e) => setSettings(prev => ({ ...prev, modName: e.target.value }))}
-                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
               />
             </div>
             <div>
@@ -245,7 +245,7 @@ export default function SettingsPage() {
                 type="text"
                 value={settings.functions.currency}
                 onChange={(e) => updateFunction('currency', e.target.value)}
-                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
               />
             </div>
             <div>
@@ -254,14 +254,14 @@ export default function SettingsPage() {
                 type="text"
                 value={settings.functions.maintenance}
                 onChange={(e) => updateFunction('maintenance', e.target.value)}
-                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
               />
             </div>
           </div>
         </div>
 
         {/* Pricing */}
-        <div className="bg-accent rounded-lg p-6 border border-none">
+        <div className="bg-accent rounded-lg p-6 !border-none !border-none-none">
           <h2 className="text-lg font-semibold text-white mb-4">Pricing</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
@@ -270,7 +270,7 @@ export default function SettingsPage() {
                 type="number"
                 value={settings.functions.prices.hr1}
                 onChange={(e) => updatePrice('hr1', e.target.value)}
-                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
               />
             </div>
             <div>
@@ -279,7 +279,7 @@ export default function SettingsPage() {
                 type="number"
                 value={settings.functions.prices.days1}
                 onChange={(e) => updatePrice('days1', e.target.value)}
-                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
               />
             </div>
             <div>
@@ -288,7 +288,7 @@ export default function SettingsPage() {
                 type="number"
                 value={settings.functions.prices.days3}
                 onChange={(e) => updatePrice('days3', e.target.value)}
-                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
               />
             </div>
             <div>
@@ -297,7 +297,7 @@ export default function SettingsPage() {
                 type="number"
                 value={settings.functions.prices.days7}
                 onChange={(e) => updatePrice('days7', e.target.value)}
-                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
               />
             </div>
             <div>
@@ -306,7 +306,7 @@ export default function SettingsPage() {
                 type="number"
                 value={settings.functions.prices.days30}
                 onChange={(e) => updatePrice('days30', e.target.value)}
-                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
               />
             </div>
             <div>
@@ -315,7 +315,7 @@ export default function SettingsPage() {
                 type="number"
                 value={settings.functions.prices.days60}
                 onChange={(e) => updatePrice('days60', e.target.value)}
-                className="w-full p-2 rounded bg-[var(--label)] text-white border border-gray-600"
+                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
               />
             </div>
           </div>

@@ -39,8 +39,8 @@ export function TeamSwitcher({
               </div>
               {state === "expanded" && (
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Kuro Panel</span>
-                  <span className="truncate text-xs">Made By NOCASH</span>
+                  <span className="truncate font-medium spbl">Kuro Panel</span>
+                  <span className="truncate text-xs spbl">Made By NOCASH</span>
                 </div>
               )}
             

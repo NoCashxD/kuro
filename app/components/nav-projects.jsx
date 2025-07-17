@@ -36,7 +36,7 @@ export function NavProjects({
             <SidebarMenuButton asChild>
               <Link href={item.href}>
                 <item.icon />
-                <span>{item.name}</span>
+                <span className="spbl">{item.name}</span>
               </Link>
             </SidebarMenuButton>
           
