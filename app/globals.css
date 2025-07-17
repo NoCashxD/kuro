@@ -5,9 +5,9 @@
 /* Theme variables */
 
 :root {
-  --background: #000000;
+  --background: black;
   --text: #ffffff;
-  --accent: #131313;
+  --accent: #18181B;
   --shadow: 0 2px 16px 0 rgba(0,0,0,0.7);
   --radius: 8px;
   --label : #181818;
@@ -33,6 +33,7 @@ html, body {
   font-size: 16px;
   letter-spacing: 0.01em;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -57,7 +58,10 @@ a:hover {
   padding: 2rem;
   margin-bottom: 2rem;
 }
-
+.keys button, .keys button span ,.keys select , .keys .relative  svg.lucide-filter , .inp {
+  color: var(--label) !important;
+  background: var(--text) !important;
+}
 button, .btn {
   font-family: 'Inter', sans-serif;
   background: var(--accent);
@@ -76,7 +80,7 @@ button:hover, .btn:hover {
   color: var(--text);
   box-shadow: 0 2px 12px 0 rgba(0,0,0,0.7);
 }
-.setting span , .spbl{
+.setting span , .spbl ,.nobtn span{
   color: var(--text) !important;
 }
 .logout{
@@ -85,7 +89,7 @@ button:hover, .btn:hover {
 span{
   color: white !important;
 }
-.keys button, .transfer button, .setting button{
+ .transfer button, .setting button{
   box-shadow: 0 1px 4px 0 rgba(0,0,0,0.5);
   
   padding: 0.75rem 1.5rem;
@@ -147,5 +151,8 @@ hr {
     background: transparent;
     box-shadow: none;
     border: none;
+  }
+  .keys button{
+    box-shadow: 0 1px 4px 0 rgba(0,0,0,0.5);
   }
 }

@@ -1,6 +1,8 @@
-'use client';
+"use client"
 
 import { useState, useEffect } from 'react';
+
+
 import { useAuth } from '../context/AuthContext';
 import { 
   Users, 
@@ -12,8 +14,7 @@ import {
   Clock,
   DollarSign
 } from 'lucide-react';
-
-export default function DashboardPage() {
+export default function Page() {
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -112,9 +113,11 @@ export default function DashboardPage() {
     if (user.level === 2) return 'Admin';
     return 'Reseller';
   };
-
   return (
-    <div className="space-y-6 ">
+    <>
+    
+       
+        <div className="space-y-6 ">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-text">Dashboard</h1>
@@ -244,5 +247,6 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+    </>
   );
-} 
+}

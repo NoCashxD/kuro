@@ -75,7 +75,7 @@ export default function HistoryPage() {
     <div className="space-y-6 flex flex-col justify-between h-[calc(100vh-128px)]">
       <div>
 
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3 keys">
         <h1 className="text-2xl font-bold text-white flex items-center gap-2">
           <FileText className="h-6 w-6" /> Activity History
         </h1>
@@ -94,23 +94,23 @@ export default function HistoryPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-3">
+      <div className="flex flex-col sm:flex-row gap-4 mb-3 keys">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 translate-y-[-50%] top-1/2 h-4 w-4 text-white/60"  style={{transform : "translateY(-50%)"}}/>
+          <Search className="absolute left-3 translate-y-[-50%] top-1/2 h-4 w-4 text-text"  style={{transform : "translateY(-50%)"}}/>
           <input
             type="text"
             placeholder="Search activities..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full !pl-[40px] pr-4 py-2 bg-accent text-white rounded border border-accent/50 focus:outline-none focus:ring-2 focus:ring-white/20 placeholder-white/60"
+            className="w-full !pl-[40px] !border-none pr-4 py-2 bg-accent text-text rounded  focus:outline-none focus:ring-2 focus:ring-white/20"
           />
         </div>
         <div className="relative">
-          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/60" style={{transform : "translateY(-50%)"}} />
+          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-text" style={{transform : "translateY(-50%)"}} />
           <select
             value={filterUser}
             onChange={(e) => setFilterUser(e.target.value)}
-            className="!pl-[40px] pr-8 py-2 bg-accent text-white rounded border border-accent/50 focus:outline-none focus:ring-2 focus:ring-white/20"
+            className="!pl-[40px] !border-none pr-8 py-2 bg-accent text-text rounded  focus:outline-none focus:ring-2 focus:ring-white/20"
           >
             <option value="">All Users</option>
             {uniqueUsers.map(user => (
@@ -121,16 +121,16 @@ export default function HistoryPage() {
       </div>
 
       {/* History Table */}
-      <div className="overflow-x-auto rounded-lg border border-accent/50">
-        <table className="min-w-full bg-black text-white">
+      <div className="overflow-x-auto rounded-lg ">
+        <table className="min-w-full bg-accent text-text text-[13px]">
           <thead>
-            <tr className="bg-accent">
-              <th className="px-4 py-3 text-left font-medium">#</th>
-              <th className="px-4 py-3 text-left font-medium">User</th>
-              <th className="px-4 py-3 text-left font-medium">Action</th>
-              <th className="px-4 py-3 text-left font-medium">Key ID</th>
-              <th className="px-4 py-3 text-left font-medium">Owner</th>
-              <th className="px-4 py-3 text-left font-medium">Date</th>
+            <tr className="bg-[var(--label)] ">
+              <th className="px-4 py-3 text-center font-medium">#</th>
+              <th className="px-4 py-3 text-center font-medium">User</th>
+              <th className="px-4 py-3 text-center font-medium">Action</th>
+              <th className="px-4 py-3 text-center font-medium">Key ID</th>
+              <th className="px-4 py-3 text-center font-medium">Owner</th>
+              <th className="px-4 py-3 text-center font-medium">Date</th>
             </tr>
           </thead>
           <tbody>
@@ -148,13 +148,13 @@ export default function HistoryPage() {
               </tr>
             ) : (
               filteredHistory.map((item, i) => (
-                <tr key={item.id} className="border-t border-accent/30 hover:bg-accent/20 transition-colors">
+                <tr key={item.id} className="text-center w-max transition-colors">
                   <td className="px-4 py-3">{(pagination.page - 1) * pagination.limit + i + 1}</td>
-                  <td className="px-4 py-3  text-white">{item.user_do}</td>
+                  <td className="px-4 py-3  text-text">{item.user_do}</td>
                   <td className="px-4 py-3">{item.info}</td>
-                  <td className="px-4 py-3  text-xs text-white/80">{item.keys_id || '-'}</td>
-                  <td className="px-4 py-3  text-white">{item.owner}</td>
-                  <td className="px-4 py-3 text-xs text-white/80">{formatDate(item.created_at)}</td>
+                  <td className="px-4 py-3  text-xs text-text">{item.keys_id || '-'}</td>
+                  <td className="px-4 py-3  text-text">{item.owner}</td>
+                  <td className="px-4 py-3 text-xs text-text">{formatDate(item.created_at)}</td>
                 </tr>
               ))
             )}
@@ -164,7 +164,7 @@ export default function HistoryPage() {
 
       {/* Pagination */}
       {pagination.pages > 1 && (
-        <div className="flex items-center justify-between bg-accent rounded-lg p-4 border border-accent/50">
+        <div className="flex items-center justify-between bg-[var(--label)] rounded-lg p-4 text-[12px]">
           <div className="text-sm text-white/60">
             Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
           </div>
@@ -194,7 +194,7 @@ export default function HistoryPage() {
       </div>
 
       {/* Summary */}
-      <div className="bg-accent rounded-lg p-4 border border-accent/50">
+      <div className="bg-accent rounded-lg p-4 ">
         <h3 className="text-lg font-semibold text-white mb-2">Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div>

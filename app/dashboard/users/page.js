@@ -114,14 +114,14 @@ export default function UsersPage() {
 
   const levelLabel = (level) => {
     if (level === 0) return <span className="px-2 py-0.5 rounded bg-purple-600 text-xs text-text">Dev</span>;
-    if (level === 1) return <span className="px-2 py-0.5 rounded bg-red-600 text-xs text-text">Owner</span>;
+    if (level === 1) return <span className="px-2 py-0.5 rounded bg-[oklch(0.75_0.2_21.65)] text-xs text-text !text-white">Owner</span>;
     if (level === 2) return <span className="px-2 py-0.5 rounded bg-blue-600 text-xs text-text">Admin</span>;
     return <span className="px-2 py-0.5 rounded bg-green-600 text-xs text-text">Reseller</span>;
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between keys">
         <h1 className="text-2xl font-bold text-text flex items-center gap-2">
           <Users className="h-6 w-6" /> Users
         </h1>
@@ -180,7 +180,7 @@ export default function UsersPage() {
 
       {/* Users Table */}
       <div className="overflow-x-auto rounded-lg  mt-4  max-[768px]:!text-[12px] " style={{ scrollbarWidth : "none"}}>
-        <table className="min-w-full bg-accent text-text w-max">
+        <table className="min-w-full bg-accent text-text w-max text-[13px]">
           <thead>
             <tr>
               <th className="px-4 py-2 text-left">#</th>
@@ -211,7 +211,7 @@ export default function UsersPage() {
                   <td className="px-4 py-2">{i + 1}</td>
                   <td className="px-4 py-2 ">{u.username}</td>
                   <td className="px-4 py-2">{u.fullname}</td>
-                  <td className="px-4 py-2">{levelLabel(u.level)}</td>
+                  <td className="px-4 py-2 !text-white">{levelLabel(u.level)}</td>
                   <td className="px-4 py-2">
                     {u.status === 1 ? (
                       <span className="inline-flex items-center gap-1 text-green-400"><CheckCircle className="h-4 w-4" /> Active</span>

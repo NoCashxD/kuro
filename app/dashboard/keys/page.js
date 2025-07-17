@@ -272,7 +272,7 @@ export default function KeysPage() {
             )}
           </span>
           <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex justify-center items-center min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px] ">
-            <input type="number" min={1} max={720} value={extendHours} onChange={e => setExtendHours(Number(e.target.value))} className="w-[126px] text-center px-4 py-1 !mb-0 rounded bg-gray-700 text-text border border-gray-600 max-h-[48px] max-[768px]:w-[50px] max-[768px]:h-[34px]" />
+            <input type="number" min={1} max={720} value={extendHours} onChange={e => setExtendHours(Number(e.target.value))} className="inp w-[126px] text-center px-4 py-1 !mb-0 rounded bg-gray-700 text-text max-h-[48px] max-[768px]:w-[50px] max-[768px]:h-[34px]" />
             <select className="max-[768px]:!text-[13px] p-2 rounded bg-gray-700 text-text border border-gray-600 !mb-0 max-[768px]:h-[38px] " value={extendUnit} onChange={e => setExtendUnit(e.target.value)}>
               <option className='text-[var(--text)]' value="hours">Hours</option>
               <option className='text-[var(--text)]' value="days">Days</option>
