@@ -165,14 +165,14 @@ export default function HistoryPage() {
       {/* Pagination */}
       {pagination.pages > 1 && (
         <div className="flex items-center justify-between bg-[var(--label)] rounded-lg p-4 text-[12px]">
-          <div className="text-sm text-white/60">
+          <div className="text-sm text-text">
             Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => handlePageChange(pagination.page - 1)}
               disabled={pagination.page <= 1}
-              className="flex items-center gap-1 px-3 py-1 bg-black text-white rounded hover:bg-accent/80 transition-colors disabled:opacity-50"
+              className="flex items-center gap-1 px-3 py-1 bg-black text-white rounded hover:bg-accent/80 transition-colors disabled:opacity-50 hover:!shadow-[none]"
             >
               <ChevronLeft className="h-4 w-4" />
               Previous
@@ -183,7 +183,7 @@ export default function HistoryPage() {
             <button
               onClick={() => handlePageChange(pagination.page + 1)}
               disabled={pagination.page >= pagination.pages}
-              className="flex items-center gap-1 px-3 py-1 bg-black text-white rounded hover:bg-accent/80 transition-colors disabled:opacity-50"
+              className="flex items-center gap-1 px-3 py-1 bg-black text-white rounded hover:bg-accent/80 transition-colors disabled:opacity-50 hover:!shadow-[none]"
             >
               Next
               <ChevronRight className="h-4 w-4" />

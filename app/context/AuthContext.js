@@ -21,7 +21,9 @@ export function AuthProvider({ children }) {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        credentials: 'include',
+      });
       if (response.ok) {
         const userData = await response.json();
         setUser(userData.user);
@@ -41,6 +43,7 @@ export function AuthProvider({ children }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password, step }),
+        credentials: 'include',
       });
 
       const data = await response.json();
@@ -75,6 +78,7 @@ export function AuthProvider({ children }) {
     try {
       await fetch('/api/auth/logout', {
         method: 'POST',
+        credentials: 'include',
       });
       setUser(null);
       setLoginStep(1);

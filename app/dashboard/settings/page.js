@@ -31,8 +31,8 @@ function UploadLib() {
     }
   };
 
-  return (
-    <form onSubmit={handleUpload} className="my-8 bg-accent p-6 rounded-lg !border-none !border-none-none flex flex-col gap-4">
+  return ( 
+    <form onSubmit={handleUpload} className="my-8 bg-accent p-6 rounded-lg !border-none !border-none-none flex flex-col gap-4 keys">
       <label className="block text-lg font-semibold text-text mb-2">Upload .so file to FTP</label>
       <input type="file" name="file" accept=".so" required className="bg-background text-text rounded p-2 !border-none !border-none-!border-none" />
       <button type="submit" disabled={uploading} className="w-fit px-4 py-2 bg-primary text-white rounded hover:bg-secondary">
@@ -130,8 +130,8 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6 setting">
-      <div className="max-[768px]:flex-col max-[768px]:gap-[20px] flex min-[768px]:items-center justify-between">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+      <div className="max-[768px]:flex-col max-[768px]:gap-[20px] flex min-[768px]:items-center justify-between keys">
+        <h1 className="text-2xl font-bold text-white flex items-center gap-2 ">
           <Settings className="h-6 w-6" /> System Settings
         </h1>
         <button

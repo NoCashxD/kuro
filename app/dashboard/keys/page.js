@@ -35,21 +35,21 @@ function EditKeyModal({ keyData, onClose, onSave }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 ">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 overflow-x-hidden" style={{scrollbarWidth : "none"}}>
       <form onSubmit={handleSubmit} className="bg-accent p-6 rounded shadow-lg w-full max-w-md h-[95vh] overflow-y-scroll">
         <h2 className="text-lg font-semibold mb-4">Edit Key</h2>
         <label>Key</label>
-        <input name="user_key" value={form.user_key} onChange={handleChange} className="w-full mb-2" />
+        <input name="user_key" value={form.user_key} onChange={handleChange} className="w-full mb-2 !border-[none]" style={{ border : "none"}} />
         <label>Game</label>
-        <input name="game" value={form.game} onChange={handleChange} className="w-full mb-2" />
+        <input name="game" value={form.game} onChange={handleChange} className="w-full mb-2 !border-[none]" style={{ border : "none"}} />
         <label>Duration (hours)</label>
-        <input name="duration" type="number" value={form.duration} onChange={handleChange} className="w-full mb-2" />
+        <input name="duration" type="number" value={form.duration} onChange={handleChange} className="w-full mb-2 !border-[none]" style={{ border : "none"}} />
         <label>Expiry Date</label>
-        <input name="expired_date" value={form.expired_date ? form.expired_date : ""} onChange={handleChange} className="w-full mb-2" />
+        <input name="expired_date" value={form.expired_date ? form.expired_date : ""} onChange={handleChange} className="w-full mb-2 !border-[none]" style={{ border : "none"}} />
         <label>Max Devices</label>
-        <input name="max_devices" type="number" value={form.max_devices} onChange={handleChange} className="w-full mb-2" />
+        <input name="max_devices" type="number" value={form.max_devices} onChange={handleChange} className="w-full mb-2 !border-[none]" style={{ border : "none"}} />
         <label>Owner</label>
-        <input name="owner" value={form.owner} onChange={handleChange} className="w-full mb-2" />
+        <input name="owner" disabled value={form.owner} onChange={handleChange} className="w-full mb-2 !border-[none]" style={{ border : "none"}} />
         
         <div className="flex gap-2 mt-4">
           <button type="button" onClick={onClose} className="bg-gray-600 px-4 py-2 rounded text-white">Cancel</button>
@@ -306,7 +306,7 @@ export default function KeysPage() {
 
       {/* Key Generation Modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 sm:px-0 h-screen" style={{scrollbarWidth : "none"}}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 sm:px-0 h-screen max-[768px]:top-0" style={{scrollbarWidth : "none"}}>
           <form onSubmit={handleCreate} className="bg-accent p-6 rounded-lg shadow-lg w-full max-w-md max-h-[95vh] overflow-y-scroll">
             <h2 className="text-lg font-semibold text-text mb-2">Generate Keys</h2>
             <div>
@@ -325,7 +325,7 @@ export default function KeysPage() {
               required
             >
               {[1, 3, 5, 10, 50, 100, 999].map(q => (
-                <option key={q} value={q}>{q === 999 ? 'Unlimited' : q}</option>
+                <option key={q} value={q}>{q === 999 ? '999' : q}</option>
               ))}
             </select>
             <div>
@@ -465,14 +465,15 @@ export default function KeysPage() {
                   <td className="px-2 sm:px-4 py-2 text-xs">{k.expired_date ? (new Date(k.expired_date).toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })) : '-'}</td>
                   <td className="px-2 sm:px-4 py-2">{k.max_devices}</td>
                   <td className="px-2 sm:px-4 py-2 flex gap-3">
-                  <button onClick={() => {  handleKeyOperations('activate',k.id);}} disabled={bulkLoading} className="px-3 py-2 rounded bg-green-600 text-text hover:bg-green-700 flex items-center gap-1 max-h-[48px]">
-              <CheckCircle className="h-4 w-4" />
-              
-            </button>
-            <button onClick={() =>  { handleKeyOperations('deactivate',k.id)}} disabled={bulkLoading} className="px-3 py-2 rounded bg-yellow-600 text-text hover:bg-yellow-700 flex items-center gap-1 max-h-[48px]">
-              <XCircle className="h-4 w-4" />
-             
-            </button>
+                    {k.status === 0 ? (
+                      <button onClick={() => { handleKeyOperations('activate', k.id); }} disabled={bulkLoading} className="px-3 py-2 rounded bg-green-600 text-text hover:bg-green-700 flex items-center gap-1 max-h-[48px]">
+                        <CheckCircle className="h-4 w-4" />
+                      </button>
+                    ) : (
+                      <button onClick={() => { handleKeyOperations('deactivate', k.id); }} disabled={bulkLoading} className="px-3 py-2 rounded bg-yellow-600 text-text hover:bg-yellow-700 flex items-center gap-1 max-h-[48px]">
+                        <XCircle className="h-4 w-4" />
+                      </button>
+                    )}
                   </td>
                   <td className="px-2 sm:px-4 py-2 ">{k.owner}</td>
                   <td className="px-2 sm:px-4 py-2">{ROLE_LABELS[k.role] || 'User'}</td>

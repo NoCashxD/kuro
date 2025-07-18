@@ -31,6 +31,8 @@ import {
   useSidebar,
 } from "./ui/sidebar"
 import { useAuth } from '../context/AuthContext';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 export function NavUser({
   
 }) {
@@ -42,6 +44,44 @@ export function NavUser({
     return 'Reseller';
   };
   const { user, loading, logout, isOwner, isAdmin, isDev } = useAuth();
+  const [showChangePass, setShowChangePass] = useState(false);
+  const [oldPass, setOldPass] = useState('');
+  const [newPass, setNewPass] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
+  const [changing, setChanging] = useState(false);
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (!oldPass || !newPass || !confirmPass) {
+      toast.error('All fields are required');
+      return;
+    }
+    if (newPass !== confirmPass) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    setChanging(true);
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oldPassword: oldPass, newPassword: newPass }),
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Password changed successfully');
+        setShowChangePass(false);
+        setOldPass(''); setNewPass(''); setConfirmPass('');
+      } else {
+        toast.error(data.error || 'Failed to change password');
+      }
+    } catch (e) {
+      toast.error('Failed to change password');
+    } finally {
+      setChanging(false);
+    }
+  };
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -81,7 +121,7 @@ export function NavUser({
             
             <DropdownMenuGroup>
              
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setShowChangePass(true)}>
                 <Bell />
                 Change Password
               </DropdownMenuItem>
@@ -95,6 +135,23 @@ export function NavUser({
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
+      {showChangePass && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2" style={{scrollbarWidth : 'none'}}>
+          <form onSubmit={handleChangePassword} className="bg-accent p-6 rounded shadow-lg w-full max-w-md">
+            <h2 className="text-lg font-semibold mb-4">Change Password</h2>
+            <label>Old Password</label>
+            <input type="password" value={oldPass} onChange={e => setOldPass(e.target.value)} className="w-full mb-2 !border-[none]" style={{ border : "none"}}/>
+            <label>New Password</label>
+            <input type="password" value={newPass} onChange={e => setNewPass(e.target.value)} className="w-full mb-2 !border-[none]" style={{ border : "none"}}/>
+            <label>Confirm New Password</label>
+            <input type="password" value={confirmPass} onChange={e => setConfirmPass(e.target.value)} className="w-full mb-2 !border-[none]"  style={{ border : "none"}}/>
+            <div className="flex gap-2 mt-4 keys">
+              <button type="button" onClick={() => setShowChangePass(false)} className="bg-gray-600 px-4 py-2 rounded text-white">Cancel</button>
+              <button type="submit" disabled={changing} className="bg-blue-600 px-4 py-2 rounded text-white">{changing ? 'Changing...' : 'Change'}</button>
+            </div>
+          </form>
+        </div>
+      )}
     </SidebarMenu>
   );
 }

@@ -305,14 +305,16 @@ export default function UsersPage() {
                   <td className="px-4 py-2">{u.fullname}</td>
                   <td className="px-4 py-2 !text-white">{levelLabel(u.level)}</td>
                   <td className="px-4 py-2">
-                    
                     <div className="flex gap-2 justify-center mt-1 keys">
-                      <button onClick={() => handleUserStatus(u.username, 'activate')} className="px-3 py-2 rounded bg-green-600 text-text hover:bg-green-700 flex items-center gap-1 max-h-[48px] hover:!shadow-[none]">
-                        <CheckCircle className="h-4 w-4" />
-                      </button>
-                      <button onClick={() => handleUserStatus(u.username, 'deactivate')} className="px-3 py-2 rounded bg-yellow-600 text-text hover:bg-yellow-700 flex items-center gap-1 max-h-[48px] hover:!shadow-[none]">
-                        <XCircle className="h-4 w-4" />
-                      </button>
+                      {u.status === 0 ? (
+                        <button onClick={() => handleUserStatus(u.username, 'activate')} className="px-3 py-2 rounded bg-green-600 text-text hover:bg-green-700 flex items-center gap-1 max-h-[48px] hover:!shadow-[none]">
+                          <CheckCircle className="h-4 w-4" />
+                        </button>
+                      ) : (
+                        <button onClick={() => handleUserStatus(u.username, 'deactivate')} className="px-3 py-2 rounded bg-yellow-600 text-text hover:bg-yellow-700 flex items-center gap-1 max-h-[48px] hover:!shadow-[none]">
+                          <XCircle className="h-4 w-4" />
+                        </button>
+                      )}
                     </div>
                   </td>
                   <td className="px-4 py-2">${u.saldo}</td>
