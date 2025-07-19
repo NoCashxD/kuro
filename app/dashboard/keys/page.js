@@ -70,7 +70,7 @@ export default function KeysPage() {
   const [creating, setCreating] = useState(false);
   const [selected, setSelected] = useState([]);
   const [bulkLoading, setBulkLoading] = useState(false);
-  const [extendHours, setExtendHours] = useState(1);
+  const [extendHours, setExtendHours] = useState("");
   const [generatedKeys, setGeneratedKeys] = useState([]);
   const [durationUnit, setDurationUnit] = useState('hours'); // 'hours' or 'days'
   const [extendUnit, setExtendUnit] = useState('hours'); // 'hours' or 'days'
@@ -380,9 +380,9 @@ export default function KeysPage() {
       
 
       {/* Bulk Actions */}
-      {/* {user.level < 3 && (
+      {user.level < 3 && (
         <div className="flex justify-between max-[768px]:w-[calc(100vw-32px)] min-[768px]:flex-wrap min-[768px]:gap-3 mb-2 overflow-x-scroll max-[768px]:p-[.65rem_0] bulky  max-[768px]:bg-[var(--label)] rounded max-[768px]:!text-[13px] " style={{ scrollbarWidth : "none"}}>
-          <span className={`flex min-[768px]:gap-[16px] ${!generatedKeys.length > 0 && "!gap-3"} `}>
+          {/* <span className={`flex min-[768px]:gap-[16px] ${!generatedKeys.length > 0 && "!gap-3"} `}>
             
             
             {generatedKeys.length > 0 && (
@@ -397,20 +397,17 @@ export default function KeysPage() {
                 </button>
               </>
             )}
-          </span>
+          </span> */}
           <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex justify-center items-center min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px] ">
-            <input type="number" min={1} max={720} value={extendHours} onChange={e => setExtendHours(Number(e.target.value))} className="inp w-[126px] text-center px-4 py-1 !mb-0 rounded bg-gray-700 text-text max-h-[48px] max-[768px]:w-[50px] max-[768px]:h-[34px]" />
-            <select className="max-[768px]:!text-[13px] p-2 rounded bg-gray-700 text-text !border-none !border-none-gray-600 !mb-0 max-[768px]:h-[38px] " value={extendUnit} onChange={e => setExtendUnit(e.target.value)}>
-              <option className='text-[var(--text)]' value="hours">Hours</option>
-              <option className='text-[var(--text)]' value="days">Days</option>
-            </select>
+            <input type="text" placeholder='1,2,3 Hours' max={720} value={extendHours} onChange={e => setExtendHours(Number(e.target.value))} className="inp w-[126px] text-center px-4 py-1 !mb-0 rounded bg-gray-700 text-text max-h-[48px] max-[768px]:w-[50px] max-[768px]:h-[34px]" />
+           
             <button type="submit" disabled={bulkLoading} className="px-3 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center gap-1">
               <RefreshCw className="h-4 w-4" />
               <span className="hidden sm:inline spbl">Extend</span>
             </button>
           </form>
         </div>
-      )} */}
+      )}
  {/* Search Input */}
  <div className="flex justify-end mt-2 w-full">
         <input
@@ -430,7 +427,7 @@ export default function KeysPage() {
       type="checkbox"
       checked={selected.length === keys.length && keys.length > 0}
       onChange={(e) => selectAll(e.target.checked)}
-      className="accent-gray-600 dark:accent-purple-600"
+      className="accent-gray-600 dark:accent-purple-600 !mb-0"
     /></th>}
               <th className="px-2 sm:px-4 py-2 ">Key</th>
               <th className="px-2 sm:px-4 py-2 ">Game</th>
@@ -458,7 +455,7 @@ export default function KeysPage() {
             ) : (
               keys.map((k, i) => (
                 <tr key={k.id} className="text-center w-max" style={{borderBottom : ".1px solid var(--border-table)"}}>
-                  {user.level < 3 && <td className="px-2 sm:px-4 py-2"><input type="checkbox" checked={selected.includes(k.id)} onChange={() => toggleSelect(k.id)} className="accent-gray-600 dark:accent-purple-600" /></td>}
+                  {user.level < 3 && <td className="px-2 sm:px-4 py-2"><input type="checkbox" checked={selected.includes(k.id)} onChange={() => toggleSelect(k.id)} className="accent-gray-600 dark:accent-purple-600 !mb-0 " /></td>}
                   <td className="px-2 sm:px-4 py-2  text-xs break-all max-w-[120px] sm:max-w-none">{k.user_key}</td>
                   <td className="px-2 sm:px-4 py-2">{k.game}</td>
                   <td className="px-2 sm:px-4 py-2">{k.duration}h</td>
