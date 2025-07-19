@@ -97,12 +97,12 @@ export default function DashboardLayout({ children }) {
             <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbItem className="">
                   <BreadcrumbLink href="/dashboard">
-                   <Home className="w-[1rem] h-[1rem]"/>
+                   <Home className="w-[1rem] h-[1rem]"/> 
                   </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbSeparator className="" />
                 <BreadcrumbItem>
                   <BreadcrumbPage>{pageTitle}</BreadcrumbPage>
                 </BreadcrumbItem>

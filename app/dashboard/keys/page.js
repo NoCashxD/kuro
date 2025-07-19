@@ -399,7 +399,7 @@ export default function KeysPage() {
             )}
           </span> */}
           <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex justify-center items-center min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px] ">
-            <input type="text" placeholder='1,2,3 Hours' max={720} value={extendHours} onChange={e => setExtendHours(Number(e.target.value))} className="inp w-[126px] text-center px-4 py-1 !mb-0 rounded bg-gray-700 text-text max-h-[48px] max-[768px]:w-[50px] max-[768px]:h-[34px]" />
+            <input type="text" placeholder='1,2,3 Hours' max={720} value={extendHours} onChange={e => setExtendHours(Number(e.target.value))} className=" inp w-[126px] text-center px-4 py-1 !mb-0 rounded bg-gray-700 text-text max-h-[48px] max-[768px]:w-[120px] max-[768px]:h-[34px]" />
            
             <button type="submit" disabled={bulkLoading} className="px-3 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center gap-1">
               <RefreshCw className="h-4 w-4" />
