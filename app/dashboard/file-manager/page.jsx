@@ -126,16 +126,16 @@ export default function FileManagerPage() {
       {notification && (
         <div className={`mb-4 px-4 py-2 rounded text-white font-medium ${notification.type === 'error' ? 'bg-red-500' : 'bg-green-600'}`}>{notification.msg}</div>
       )}
-      <form onSubmit={handleUpload} className="flex flex-col md:flex-row gap-4 items-center mb-8 keys items-center">
+      <form onSubmit={handleUpload} className="flex  md:flex-row gap-4 items-center mb-8 keys items-center">
         <input ref={fileInputRef} type="file" accept=".zip,.json,.so,.apk" className="text-label file-input-bordered file-input-sm w-full max-w-xs !border-none !mb-0" />
         <button type="submit" disabled={uploading} className="bg-primary text-white px-4 py-2 rounded font-semibold  transition disabled:opacity-50">
           {uploading ? 'Uploading...' : 'Upload'}
         </button>
       </form>
-      <div className="overflow-x-auto">
-        <table className="min-w-full rounded">
+      <div className="overflow-x-auto mt-4 max-[768px]:!text-[12px] text-center" style={{scrollbarWidth : "none"}}>
+        <table className="min-w-max  rounded text-[13px]" >
           <thead>
-            <tr className="text-left border-b border-[var(--border-table)]">
+            <tr className=" border-b border-[var(--border-table)]">
               <th className="py-2 px-3">File Name</th>
               <th className="py-2 px-3">Size</th>
               <th className="py-2 px-3">Uploaded</th>
@@ -151,12 +151,12 @@ export default function FileManagerPage() {
                 <td className="py-2 px-3 break-all">{file.name}</td>
                 <td className="py-2 px-3">{formatSize(file.size)}</td>
                 <td className="py-2 px-3">{formatDate(file.mtime)}</td>
-                <td className="py-2 px-3 flex gap-2 keys">
+                <td className="py-2 px-3 flex gap-2 keys justify-center">
                   {file.name.endsWith('.json') && (
-                    <button onClick={() => openJsonEditor(file.name)} className="text-blue-600  p-4 py-2 !shadow-none">Edit</button>
+                    <button onClick={() => openJsonEditor(file.name)} className="text-blue-600 !text-[12px]  p-4 py-2 !shadow-none">Edit</button>
                   )}
-                  <button onClick={() => handleCopyLink(file.name)} className="text-green-600 p-4 py-2 !shadow-none ">Copy Link</button>
-                  <button onClick={() => handleDelete(file.name)} className="text-red-600 p-4 py-2 !shadow-none">Delete</button>
+                  <button onClick={() => handleCopyLink(file.name)} className="text-green-600 !text-[12px] p-4 py-2 !shadow-none ">Copy Link</button>
+                  <button onClick={() => handleDelete(file.name)} className="text-red-600 p-4 !text-[12px] py-2 !shadow-none">Delete</button>
                 </td>
               </tr>
             ))}

@@ -60,7 +60,7 @@ a:hover {
   padding: 2rem;
   margin-bottom: 2rem;
 }
-.keys button, .keys button span ,.keys select , .keys .relative  svg.lucide-filter , .inp {
+.keys button, .keys button span , .keys .relative  svg.lucide-filter , .inp {
   color: var(--label) !important;
   background: var(--text) !important;
 }

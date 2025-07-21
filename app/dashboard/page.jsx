@@ -19,9 +19,11 @@ export default function Page() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currency, setCurrency] = useState('$');
 
   useEffect(() => {
     fetchStats();
+    fetchCurrency();
   }, []);
 
   const fetchStats = async () => {
@@ -44,6 +46,18 @@ export default function Page() {
       setError('Network error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCurrency = async () => {
+    try {
+      const res = await fetch('/api/settings');
+      const data = await res.json();
+      if (data.success && data.settings?.functions?.currency) {
+        setCurrency(data.settings.functions.currency);
+      }
+    } catch (e) {
+      // fallback to default
     }
   };
 
@@ -77,7 +91,7 @@ export default function Page() {
       title: 'Total Keys',
       value: stats?.keys?.total || 0,
       icon: Key,
-      color: 'bg-blue-600',
+      color: 'bg-[var(--text)]',
       change: '+12%',
       changeType: 'positive'
     },
@@ -85,7 +99,7 @@ export default function Page() {
       title: 'Active Keys',
       value: stats?.keys?.active || 0,
       icon: CheckCircle,
-      color: 'bg-green-600',
+      color: 'bg-[var(--text)]',
       change: '+5%',
       changeType: 'positive'
     },
@@ -93,7 +107,7 @@ export default function Page() {
       title: 'Total Users',
       value: stats?.users?.total || 0,
       icon: Users,
-      color: 'bg-purple-600',
+      color: 'bg-[var(--text)]',
       change: '+8%',
       changeType: 'positive'
     },
@@ -101,7 +115,7 @@ export default function Page() {
       title: 'Recent Activity',
       value: stats?.activity?.recent || 0,
       icon: Activity,
-      color: 'bg-orange-600',
+      color: 'bg-[var(--text)]',
       change: '+15%',
       changeType: 'positive'
     }
@@ -113,11 +127,13 @@ export default function Page() {
     if (user.level === 2) return 'Admin';
     return 'Reseller';
   };
+  const isDevOrOwner = user.level === 0 || user.level === 1;
   return (
     <>
     
        
         <div className="space-y-6 ">
+     
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-text">Dashboard</h1>
@@ -127,16 +143,16 @@ export default function Page() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 svgblack">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((card, index) => (
           <div key={index} className="bg-accent rounded shadow-card p-6">
             <div className="flex items-center">
               <div className={`p-2 rounded ${card.color}`}>
-                <card.icon className="h-6 w-6 text-text" />
+                <card.icon className="h-6 w-6 inp" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium ">{card.title}</p>
-                <p className="text-2xl font-bold text-text">{card.value}</p>
+                <p className="text-2xl font-bold">{card.value}</p>
               </div>
             </div>
             <div className="mt-4 flex items-center">
@@ -163,7 +179,7 @@ export default function Page() {
             <DollarSign className="h-5 w-5  mr-3" />
             <div>
               <p className="text-sm ">Balance</p>
-              <p className="text-text font-medium">${user.saldo}</p>
+              <p className="text-text font-medium">{currency}{user.saldo}</p>
             </div>
           </div>
           <div className="flex items-center">
@@ -232,18 +248,22 @@ export default function Page() {
       <div className="bg-accent rounded shadow-card p-6">
         <h2 className="text-lg font-semibold text-text mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 !text-white">
-          <a href="/dashboard/keys" className="flex items-center justify-center px-4 py-2 bg-purple-600 text-text rounded hover:bg-purple-700 transition-colors">
+          <a href="/dashboard/keys" className="flex items-center justify-center px-4 py-2 inp  rounded  transition-colors">
             <Key className="h-5 w-5 mr-2" />
             Generate Keys
           </a>
-          <a href="/dashboard/users" className="flex items-center justify-center px-4 py-2 bg-blue-600 text-text rounded hover:bg-blue-700 transition-colors">
+          {isDevOrOwner && (
+            <>
+          <a href="/dashboard/users" className="flex items-center justify-center px-4 py-2 inp  rounded  transition-colors">
             <Users className="h-5 w-5 mr-2" />
             Add User
           </a>
-          <a href="/dashboard/history" className="flex items-center justify-center px-4 py-2 bg-green-600 text-text rounded hover:bg-green-700 transition-colors">
+          <a href="/dashboard/history" className="flex items-center justify-center px-4 py-2 inp  rounded  transition-colors">
             <Activity className="h-5 w-5 mr-2" />
             View Reports
           </a>
+            </>
+          )}
         </div>
       </div>
     </div>

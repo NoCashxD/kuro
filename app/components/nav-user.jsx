@@ -31,7 +31,7 @@ import {
   useSidebar,
 } from "./ui/sidebar"
 import { useAuth } from '../context/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 export function NavUser({
   
@@ -49,6 +49,20 @@ export function NavUser({
   const [newPass, setNewPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [changing, setChanging] = useState(false);
+  const [currency, setCurrency] = useState('$');
+
+  useEffect(() => {
+    async function fetchCurrency() {
+      try {
+        const res = await fetch('/api/settings');
+        const data = await res.json();
+        if (data.success && data.settings?.functions?.currency) {
+          setCurrency(data.settings.functions.currency);
+        }
+      } catch (e) {}
+    }
+    fetchCurrency();
+  }, []);
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -96,6 +110,7 @@ export function NavUser({
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight ">
                 <span className="truncate font-medium capitalize ">{user.username}</span>
+                <span className="truncate text-xs text-gray-400">Balance: {currency}{user.saldo}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>

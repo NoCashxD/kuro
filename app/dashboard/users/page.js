@@ -205,10 +205,10 @@ export default function UsersPage() {
   };
 
   const levelLabel = (level) => {
-    if (level === 0) return <span className="px-2 py-0.5 rounded bg-purple-600 text-xs text-text">Dev</span>;
-    if (level === 1) return <span className="px-2 py-0.5 rounded bg-[oklch(0.75_0.2_21.65)] text-xs text-text !text-white">Owner</span>;
-    if (level === 2) return <span className="px-2 py-0.5 rounded bg-blue-600 text-xs text-text">Admin</span>;
-    return <span className="px-2 py-0.5 rounded bg-green-600 text-xs text-text">Reseller</span>;
+    if (level === 0) return <span className="px-2 py-0.5 rounded inp !text-[var(--label)]  text-xs ">Dev</span>;
+    if (level === 1) return <span className="px-2 py-0.5 rounded inp  !text-[var(--label)] text-xs ">Owner</span>;
+    if (level === 2) return <span className="px-2 py-0.5 rounded inp !text-[var(--label)] text-xs ">Admin</span>;
+    return <span className="px-2 py-0.5 rounded inp text-xs !text-[var(--label)]">Reseller</span>;
   };
 
   return (
@@ -303,7 +303,7 @@ export default function UsersPage() {
                   <td className="px-4 py-2">{i + 1}</td>
                   <td className="px-4 py-2 ">{u.username}</td>
                   <td className="px-4 py-2">{u.fullname}</td>
-                  <td className="px-4 py-2 !text-white">{levelLabel(u.level)}</td>
+                  <td className="px-4 py-2">{levelLabel(u.level)}</td>
                   <td className="px-4 py-2">
                     <div className="flex gap-2 justify-center mt-1 keys">
                       {u.status === 0 ? (

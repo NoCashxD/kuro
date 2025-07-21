@@ -35,8 +35,8 @@ function EditKeyModal({ keyData, onClose, onSave }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 overflow-x-hidden" style={{scrollbarWidth : "none"}}>
-      <form onSubmit={handleSubmit} className="bg-accent p-6 rounded shadow-lg w-full max-w-md h-[95vh] overflow-y-scroll">
+    <div className="fixed inset-0 z-50 flex min-[768px]:items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 overflow-x-hidden" >
+      <form onSubmit={handleSubmit} className="bg-accent p-6 rounded shadow-lg w-full max-w-md min-[768px]:h-[95vh] h-[100vh] overflow-y-scroll" style={{scrollbarWidth : "none"}}>
         <h2 className="text-lg font-semibold mb-4">Edit Key</h2>
         <label>Key</label>
         <input name="user_key" value={form.user_key} onChange={handleChange} className="w-full mb-2 !border-[none]" style={{ border : "none"}} />
@@ -66,7 +66,7 @@ export default function KeysPage() {
   const [keys, setKeys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
-  const [form, setForm] = useState({ game: '', quantity: 1, duration: 1, max_devices: 1, prefix: 'NOCASH', trial: false });
+  const [form, setForm] = useState({ game: '', quantity: 1, duration: 1, max_devices: 1, prefix: 'VIP', trial: false });
   const [creating, setCreating] = useState(false);
   const [selected, setSelected] = useState([]);
   const [bulkLoading, setBulkLoading] = useState(false);
@@ -291,18 +291,7 @@ export default function KeysPage() {
 
   return (
     <div className="space-y-6 keys">
-      <div className="flex max-[768px]:justify-center flex-col sm:flex-row items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold text-text flex items-center gap-2">
-          <Key className="h-6 w-6" /> Keys
-        </h1>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex justify-center items-center gap-2 px-4 py-2 bg-purple-600 text-text rounded hover:bg-purple-700 w-full sm:w-auto"
-        >
-          <Plus className="h-4 w-4" /> Generate Keys
-        </button>
-      </div>
-     
+      
 
       {/* Key Generation Modal */}
       {showCreate && (
@@ -311,7 +300,7 @@ export default function KeysPage() {
             <h2 className="text-lg font-semibold text-text mb-2">Generate Keys</h2>
             <div>
               <label className="block text-sm ">Game</label>
-              <select className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600" required value={form.game} onChange={e => setForm(f => ({ ...f, game: e.target.value }))}>
+              <select className="w-full mt-1 p-2 rounded bg-gray-700 text-text border !border-none" required value={form.game} onChange={e => setForm(f => ({ ...f, game: e.target.value }))}>
                 <option value="">Select Game</option>
                 {GAME_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
               </select>
@@ -319,7 +308,7 @@ export default function KeysPage() {
             
             <label className="block text-sm ">Quantity</label>
             <select
-              className="w-full mt-1 p-2 rounded bg-gray-700 text-text border border-gray-600"
+              className="w-full mt-1 p-2 rounded bg-gray-700 text-text border !border-none"
               value={form.quantity}
               onChange={e => setForm(f => ({ ...f, quantity: Number(e.target.value) }))}
               required
@@ -331,7 +320,7 @@ export default function KeysPage() {
             <div>
               <label className="block text-sm ">Duration</label>
               <div className="flex justify-center gap-2 items-center mb-2">
-                <select className="w-full p-2 rounded bg-gray-700 text-text border border-gray-600" required value={form.duration} onChange={e => setForm(f => ({ ...f, duration: Number(e.target.value) }))}>
+                <select className="w-full p-2 rounded bg-gray-700 text-text border !border-none" required value={form.duration} onChange={e => setForm(f => ({ ...f, duration: Number(e.target.value) }))}>
                   {DURATION_OPTIONS.map(opt => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label} / {currency}{prices[durationLabelToPriceKey(opt.label)] || '?'}
@@ -341,14 +330,8 @@ export default function KeysPage() {
               </div>
             </div>
             {/* Total price summary */}
-            <div className="text-right font-semibold text-[14px] mt-4 mb-2 dark:text-[whitesmoke] font-mono text-[#333]">
-              {(() => {
-                const priceKey = durationLabelToPriceKey(DURATION_OPTIONS.find(opt => opt.value === form.duration)?.label || '1 Hour');
-                const pricePerKey = Number(prices[priceKey]) || 1;
-                const total = form.quantity * pricePerKey;
-                return `Total = ${form.quantity} x ${currency}${pricePerKey} = ${currency}${total}`;
-              })()}
-            </div>
+           
+            
             <div>
               <label className="block text-sm ">Max Devices</label>
               <input type="number" min={1} max={10} className="w-full mt-1 p-2 rounded bg-label !border-none text-text" required value={form.max_devices} onChange={e => setForm(f => ({ ...f, max_devices: Number(e.target.value) }))} />
@@ -358,12 +341,21 @@ export default function KeysPage() {
               <input type="text" className="w-full mt-1 p-2 rounded bg-label !border-none text-text" value={form.prefix} onChange={e => setForm(f => ({ ...f, prefix: e.target.value }))} maxLength={16} />
               {/* <span className="text-xs text-gray-400">Keys will be generated as {form.prefix}-XYZ123</span> */}
             </div>
+            <div className="text-right font-semibold text-[14px] mb-2 dark:text-[whitesmoke] font-mono text-[#333]">
+              {(() => {
+                const priceKey = durationLabelToPriceKey(DURATION_OPTIONS.find(opt => opt.value === form.duration)?.label || '1 Hour');
+                const pricePerKey = Number(prices[priceKey]) || 1;
+                const total = form.quantity * pricePerKey;
+                return <input readOnly className="w-full mt-1 p-2 rounded bg-label !border-none text-text" placeholder={`${currency}${total}`} />;
+              })()}
+            </div>
             <div className='flex items-center !mt-2 !my-4 '>
               <label className="inline-flex items-center gap-2 text-sm ">
                 <input type="checkbox" checked={useOnlyPrefix} onChange={e => setUseOnlyPrefix(e.target.checked)} className="accent-gray-600 dark:accent-purple-600 !mb-0" />
                 Use only prefix as key (no random suffix)
               </label>
               </div>
+              
            
             <div className="flex justify-center flex-col sm:flex-row gap-2 max-[768px]:mt-16 max-h-[48px] mb-2">
               <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-3 rounded bg-gray-600 text-text hover:bg-gray-700">Cancel</button>
@@ -381,7 +373,7 @@ export default function KeysPage() {
 
       {/* Bulk Actions */}
       {user.level < 3 && (
-        <div className="flex justify-between max-[768px]:w-[calc(100vw-32px)] min-[768px]:flex-wrap min-[768px]:gap-3 mb-2 overflow-x-scroll max-[768px]:p-[.65rem_0] bulky  max-[768px]:bg-[var(--label)] rounded max-[768px]:!text-[13px] " style={{ scrollbarWidth : "none"}}>
+        <div className="flex justify-between max-[768px]:w-[calc(100vw-32px)] min-[768px]:flex-wrap min-[768px]:gap-3 mb-2 overflow-x-scroll max-[768px]:p-[.65rem_0] bulky  rounded max-[768px]:!text-[13px] " style={{ scrollbarWidth : "none"}}>
           {/* <span className={`flex min-[768px]:gap-[16px] ${!generatedKeys.length > 0 && "!gap-3"} `}>
             
             
@@ -398,13 +390,22 @@ export default function KeysPage() {
               </>
             )}
           </span> */}
-          <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex justify-center items-center min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px] ">
+          <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex justify-between w-full items-center min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px] ">
+           <span className='flex min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px]'>
+
             <input type="text" placeholder='1,2,3 Hours' max={720} value={extendHours} onChange={e => setExtendHours(Number(e.target.value))} className=" inp w-[126px] text-center px-4 py-1 !mb-0 rounded bg-gray-700 text-text max-h-[48px] max-[768px]:w-[120px] max-[768px]:h-[34px]" />
            
             <button type="submit" disabled={bulkLoading} className="px-3 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center gap-1">
               <RefreshCw className="h-4 w-4" />
               <span className="hidden sm:inline spbl">Extend</span>
             </button>
+           </span>
+            <button
+          onClick={() => setShowCreate(true)}
+          className="flex justify-center items-center gap-2 px-4 py-2 bg-purple-600 text-text rounded hover:bg-purple-700 w-full sm:w-auto"
+        >
+          <Plus className="h-4 w-4" /> Generate Keys
+        </button>
           </form>
         </div>
       )}
@@ -436,7 +437,6 @@ export default function KeysPage() {
               <th className="px-2 sm:px-4 py-2 ">Max Devices</th>
               <th className="px-2 sm:px-4 py-2 ">Status</th>
               <th className="px-2 sm:px-4 py-2 ">Owner</th>
-              <th className="px-2 sm:px-4 py-2 ">Role</th>
               <th className="px-2 sm:px-4 py-2 ">Created</th>
               <th className="px-2 sm:px-4 py-2 ">Action</th>
             </tr>
@@ -473,7 +473,7 @@ export default function KeysPage() {
                     )}
                   </td>
                   <td className="px-2 sm:px-4 py-2 ">{k.owner}</td>
-                  <td className="px-2 sm:px-4 py-2">{ROLE_LABELS[k.role] || 'User'}</td>
+                 
                   <td className="px-2 sm:px-4 py-2 text-xs">{k.created_at?.slice(0, 10)}</td>
                   <td className="px-2 sm:px-4 py-2 text-xs flex">
                     <button onClick={() => handleKeyOperations('delete',k.id)} disabled={bulkLoading} className="px-3 py-2 rounded bg-red-600 text-text hover:bg-red-700 flex items-center gap-1 max-h-[48px]">

@@ -6,7 +6,8 @@ export async function POST(req) {
     if (!userId || !['activate', 'deactivate'].includes(action)) {
       return new Response(JSON.stringify({ success: false, error: 'Invalid request' }), { status: 400 });
     }
-    const status = action === 'activate' ? 'active' : 'blocked';
+    // Use numeric status for DB
+    const status = action === 'activate' ? 1 : 0;
     const result = await updateUserStatus(userId, status);
     if (result) {
       return new Response(JSON.stringify({ success: true }), { status: 200 });

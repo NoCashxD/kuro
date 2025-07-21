@@ -5,43 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Settings, Loader2, Save, ToggleLeft, ToggleRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-function UploadLib() {
-  const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState('');
 
-  const handleUpload = async (e) => {
-    e.preventDefault();
-    setMessage('');
-    const file = e.target.elements.file.files[0];
-    if (!file) return;
-    setUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    try {
-      const res = await fetch('/api/upload-lib', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      setMessage(data.success ? 'Upload successful!' : data.error || 'Upload failed');
-    } catch (err) {
-      setMessage('Upload failed');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  return ( 
-    <form onSubmit={handleUpload} className="my-8 bg-accent p-6 rounded-lg !border-none !border-none-none flex flex-col gap-4 keys">
-      <label className="block text-lg font-semibold text-text mb-2">Upload .so file to FTP</label>
-      <input type="file" name="file" accept=".so" required className="bg-background text-text rounded p-2 !border-none !border-none-!border-none" />
-      <button type="submit" disabled={uploading} className="w-fit px-4 py-2 bg-primary text-white rounded hover:bg-secondary">
-        {uploading ? 'Uploading...' : 'Upload .so'}
-      </button>
-      {message && <div className="text-sm text-danger">{message}</div>}
-    </form>
-  );
-}
 
 export default function SettingsPage() {
   const { hasPermission } = useAuth();
@@ -266,6 +230,24 @@ export default function SettingsPage() {
               />
             </div>
             <div>
+              <label className="block text-sm  mb-2">2 Hour</label>
+              <input
+                type="number"
+                value={settings.functions.prices.hr1}
+                onChange={(e) => updatePrice('hr2', e.target.value)}
+                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
+              />
+            </div>
+            <div>
+              <label className="block text-sm  mb-2">5 Hour</label>
+              <input
+                type="number"
+                value={settings.functions.prices.hr1}
+                onChange={(e) => updatePrice('hr1', e.target.value)}
+                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
+              />
+            </div>
+            <div>
               <label className="block text-sm  mb-2">1 Day</label>
               <input
                 type="number"
@@ -313,7 +295,7 @@ export default function SettingsPage() {
           </div>
         </div>
       </form>
-      {hasPermission(1) && <UploadLib />}
+      
     </div>
   );
 } 
