@@ -171,8 +171,8 @@ export function AppSidebar({
     { name: 'History', href: '/dashboard/history', icon: FileText, level: 2 },
     // New: Balance Transfer (Owner/Admin only)
     ...(user.level <= 2 ? [{ name: 'Transfer Balance', href: '/dashboard/users/transfer-balance', icon: Key, level: 2 }] : []),
-    // File Manager (external link)
-    { name: 'File Manager', href: 'https://keysgen.site/filemanager/', icon: Folder, level: 3, external: true },
+    // File Manager (internal link)
+    { name: 'File Manager', href: '/dashboard/file-manager', icon: Folder, level: 3 },
       { name: 'Online Functions', href: '/dashboard/settings', icon: Settings, level: 1 },
   ].filter(item => user.level <= item.level);
   return (
