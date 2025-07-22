@@ -293,9 +293,7 @@ export default function KeysPage() {
     <div className="space-y-6 keys">
       
       <div className="flex max-[768px]:justify-center flex-col sm:flex-row items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold text-text flex items-center gap-2">
-          <Key className="h-6 w-6" /> Keys
-        </h1>
+       
         <button
           onClick={() => setShowCreate(true)}
           className="flex justify-center items-center gap-2 px-4 py-2 bg-purple-600 text-text rounded hover:bg-purple-700 w-full sm:w-auto"
@@ -385,7 +383,20 @@ export default function KeysPage() {
       {/* Bulk Actions */}
       {user.level < 3 && (
         <div className="flex justify-between max-[768px]:w-[calc(100vw-32px)] min-[768px]:flex-wrap min-[768px]:gap-3 mb-2 overflow-x-scroll max-[768px]:p-[.65rem_0] bulky  rounded max-[768px]:!text-[13px] " style={{ scrollbarWidth : "none"}}>
-          <span className={`flex min-[768px]:gap-[16px] ${!generatedKeys.length > 0 && "!gap-3"} `}>
+          
+          <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex justify-between w-full items-center min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px] ">
+           <span className='flex min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px]'>
+
+            <input type="text" placeholder='1,2,3 Hours' max={720} value={extendHours} onChange={e => setExtendHours(Number(e.target.value))} className=" inp w-[126px] text-center px-4 py-1 !mb-0 rounded bg-gray-700 text-text max-h-[48px] max-[768px]:w-[120px] max-[768px]:h-[34px]" />
+           
+            <button type="submit" disabled={bulkLoading} className="px-3 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center gap-1">
+              <RefreshCw className="h-4 w-4" />
+              <span className="hidden sm:inline spbl">Extend</span>
+            </button>
+           </span>
+          
+          </form>
+         <span className={`flex min-[768px]:gap-[16px] ${!generatedKeys.length > 0 && "!gap-3"} `}>
             
             
             {generatedKeys.length > 0 && (
@@ -401,18 +412,6 @@ export default function KeysPage() {
               </>
             )}
           </span>
-          <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex justify-between w-full items-center min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px] ">
-           <span className='flex min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px]'>
-
-            <input type="text" placeholder='1,2,3 Hours' max={720} value={extendHours} onChange={e => setExtendHours(Number(e.target.value))} className=" inp w-[126px] text-center px-4 py-1 !mb-0 rounded bg-gray-700 text-text max-h-[48px] max-[768px]:w-[120px] max-[768px]:h-[34px]" />
-           
-            <button type="submit" disabled={bulkLoading} className="px-3 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center gap-1">
-              <RefreshCw className="h-4 w-4" />
-              <span className="hidden sm:inline spbl">Extend</span>
-            </button>
-           </span>
-          
-          </form>
         </div>
       )}
  {/* Search Input */}
