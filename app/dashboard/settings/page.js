@@ -162,7 +162,7 @@ export default function SettingsPage() {
               <a
                 type="button"
                 onClick={() => updateFunction('bullet', !settings.functions.bullet)}
-                className={`p-2 rounded ${settings.functions.bullet ? 'bg-green-600' : 'bg-gray-600'}`}
+                className={`p-2 rounded !bg-transparent ${settings.functions.bullet ? 'bg-green-600' : 'bg-gray-600'}`}
               >
                 {settings.functions.bullet ? <ToggleRight className="h-10 w-10 text-white" /> : <ToggleLeft className="h-10 w-10 text-white" />}
               </a>
@@ -172,7 +172,7 @@ export default function SettingsPage() {
               <a
                 type="button"
                 onClick={() => updateFunction('aimbot', !settings.functions.aimbot)}
-                className={`p-2 rounded ${settings.functions.aimbot ? 'bg-green-600' : 'bg-gray-600'}`}
+                className={`p-2 rounded !bg-transparent ${settings.functions.aimbot ? 'bg-green-600' : 'bg-gray-600'}`}
               >
                 {settings.functions.aimbot ? <ToggleRight className="h-10 w-10 text-white" /> : <ToggleLeft className="h-10 w-10 text-white" />}
               </a>
@@ -182,7 +182,7 @@ export default function SettingsPage() {
               <a
                 type="button"
                 onClick={() => updateFunction('memory', !settings.functions.memory)}
-                className={`p-2 rounded ${settings.functions.memory ? 'bg-green-600' : 'bg-gray-600'}`}
+                className={`p-2 rounded !bg-transparent ${settings.functions.memory ? 'bg-green-600' : 'bg-gray-600'}`}
               >
                 {settings.functions.memory ? <ToggleRight className="h-10 w-10 text-white" /> : <ToggleLeft className="h-10 w-10 text-white" />}
               </a>
