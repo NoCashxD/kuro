@@ -132,8 +132,8 @@ export default function FileManagerPage() {
           {uploading ? 'Uploading...' : 'Upload'}
         </button>
       </form>
-      <div className="overflow-x-auto mt-4 max-[768px]:!text-[12px] text-center" style={{scrollbarWidth : "none"}}>
-        <table className="min-w-max  rounded text-[13px]" >
+      <div className="overflow-x-auto mt-4 max-[768px]:!text-[12px] text-center w-full" style={{scrollbarWidth : "none"}}>
+        <table className="min-w-max w-full  rounded text-[13px] bg-accent" >
           <thead>
             <tr className=" border-b border-[var(--border-table)]">
               <th className="py-2 px-3">File Name</th>

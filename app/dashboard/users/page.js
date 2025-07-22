@@ -30,7 +30,7 @@ function EditUserModal({ userData, onClose, onSave }) {
           name="username"
           value={form.username}
           onChange={handleChange}
-          className="w-full mb-2 !!border-none-none"
+          className="w-full mb-2 !border-none"
         />
         <label>Expiration Date</label>
         <input
@@ -38,7 +38,7 @@ function EditUserModal({ userData, onClose, onSave }) {
           type="date"
           value={form.expiration_date}
           onChange={handleChange}
-          className="w-full mb-2 !!border-none-none"
+          className="w-full mb-2 !border-none"
         />
         <div className="flex gap-2 mt-4 keys justify-center">
           <button type="button" onClick={onClose} className="bg-gray-600 px-4 py-2 rounded text-white w-1/2">Cancel</button>
@@ -229,8 +229,8 @@ export default function UsersPage() {
 
       {/* Create User Modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] p-2 sm:p-0 h-screen">
-          <form onSubmit={handleCreate} className="bg-accent p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-md space-y-4  h-[90vh] overflow-y-scroll" style={{scrollbarWidth : "none"}}>
+        <div className="fixed inset-0 z-50 flex min-[768px]:items-center justify-center bg-[rgba(0,0,0,0.3)] p-2 sm:p-0 h-screen">
+          <form onSubmit={handleCreate} className="bg-accent p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-md space-y-4  min-[768px]:h-screen h-max overflow-y-scroll" style={{scrollbarWidth : "none"}}>
             <h2 className="text-lg font-semibold text-text mb-2">Create New User</h2>
             <div>
               <label className="block text-sm ">Full Name</label>

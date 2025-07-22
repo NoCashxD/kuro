@@ -126,7 +126,7 @@ export function NavUser({
                   <AvatarImage src={user.avatar} alt={user.username} />
                   <AvatarFallback className="rounded-lg  bg-[var(--label)]">N</AvatarFallback>
                 </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight mb-4">
+                <div className="grid flex-1 text-left text-sm leading-tight items-center">
                   <span className="truncate font-medium capitalize">{user.username}</span>
                   <span className="truncate text-xs">{getRoleText()}</span>
                 </div>

@@ -105,12 +105,12 @@ export default function HistoryPage() {
             className="w-full !pl-[40px] !border-none pr-4 py-2 bg-accent text-text rounded  focus:outline-none focus:ring-2 focus:ring-white/20"
           />
         </div>
-        <div className="relative">
-          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-text" style={{transform : "translateY(-50%)"}} />
+        <div className="relative ">
+          <Filter className="absolute inp left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-text" style={{transform : "translateY(-50%)"}} />
           <select
             value={filterUser}
             onChange={(e) => setFilterUser(e.target.value)}
-            className="!pl-[40px] !border-none pr-8 py-2 bg-accent text-text rounded  focus:outline-none focus:ring-2 focus:ring-white/20"
+            className="!pl-[40px] !border-none pr-8 py-2 inp bg-accent text-text rounded  focus:outline-none focus:ring-2 focus:ring-white/20"
           >
             <option value="">All Users</option>
             {uniqueUsers.map(user => (

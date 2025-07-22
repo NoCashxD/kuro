@@ -52,17 +52,22 @@ async function getUsers(req) {
 // Create new user
 async function createNewUser(req) {
   try {
-    const { fullname, username, password, level, saldo, uplink, expiration_date } = await req.json();
+    const body = await req.json();
+    console.log('Incoming payload:', body);
+    const { fullname, username, password, level, saldo, uplink, expiration_date } = body;
     const currentUser = req.user;
+    console.log('Current user:', currentUser);
     
     // Validate required fields
     if (!fullname || !username || !password) {
+      console.log('Validation failed:', { fullname, username, password });
       return NextResponse.json({ error: 'Fullname, username, and password are required' }, { status: 400 });
     }
     
     // Check if username already exists
     const existingUser = await query('SELECT id_users FROM users WHERE username = ?', [username]);
     if (existingUser.length > 0) {
+      console.log('Username already exists:', username);
       return NextResponse.json({ error: 'Username already exists' }, { status: 409 });
     }
     
@@ -79,10 +84,13 @@ async function createNewUser(req) {
       allowedLevels = [3];
     } else {
       // Reseller can't create users
-      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
+      console.log('Insufficient permissions for user:', currentUser);
+     // return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
+    console.log('Allowed levels for current user:', allowedLevels);
     
     if (!allowedLevels.includes(level)) {
+      console.log('Attempted to create user with disallowed level:', level);
       return NextResponse.json({ error: 'Cannot create user with this role' }, { status: 403 });
     }
     
@@ -98,6 +106,7 @@ async function createNewUser(req) {
       // Admin creates users under their owner's hierarchy
       owner = currentUser.owner;
     }
+    console.log('Owner for new user:', owner);
     
     // Set uplink to current user
     const userUplink = currentUser.username;
@@ -113,6 +122,7 @@ async function createNewUser(req) {
       owner,
       expiration_date
     });
+    console.log('Created userId:', userId);
     
     // Log activity
     await logActivity(
@@ -235,7 +245,7 @@ const handler = async (req) => {
 // Apply authentication and role-based access control
 // Level 2 (Admin) and above can manage users
 export const GET = withAuthRoleAndOwner(2)(handler);
-export const POST = withAuthRoleAndOwner(0)(async (req, context) => {
+export const POST = withAuthRoleAndOwner(2)(async (req, context) => {
   const url = req.nextUrl || req.url;
   if (typeof url === 'string' ? url.includes('block-hierarchy') : url.pathname.includes('block-hierarchy')) {
     return blockOwnerHierarchy(req);

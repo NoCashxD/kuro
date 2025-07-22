@@ -36,7 +36,7 @@ function EditKeyModal({ keyData, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 z-50 flex min-[768px]:items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 overflow-x-hidden" >
-      <form onSubmit={handleSubmit} className="bg-accent p-6 rounded shadow-lg w-full max-w-md min-[768px]:h-[95vh] h-[100vh] overflow-y-scroll" style={{scrollbarWidth : "none"}}>
+      <form onSubmit={handleSubmit} className="bg-accent p-6 rounded shadow-lg w-full max-w-md min-[768px]:h-[95vh] h-max overflow-y-scroll" style={{scrollbarWidth : "none"}}>
         <h2 className="text-lg font-semibold mb-4">Edit Key</h2>
         <label>Key</label>
         <input name="user_key" value={form.user_key} onChange={handleChange} className="w-full mb-2 !border-[none]" style={{ border : "none"}} />
@@ -52,8 +52,8 @@ function EditKeyModal({ keyData, onClose, onSave }) {
         <input name="owner" disabled value={form.owner} onChange={handleChange} className="w-full mb-2 !border-[none]" style={{ border : "none"}} />
         
         <div className="flex gap-2 mt-4">
-          <button type="button" onClick={onClose} className="bg-gray-600 px-4 py-2 rounded text-white">Cancel</button>
-          <button type="submit" className="bg-blue-600 px-4 py-2 rounded text-white">Save</button>
+          <button type="button" onClick={onClose} className="bg-gray-600 px-4 py-2 rounded text-white w-full">Cancel</button>
+          <button type="submit" className="bg-blue-600 px-4 py-2 rounded text-white w-full">Save</button>
         </div>
       </form>
     </div>
@@ -292,11 +292,22 @@ export default function KeysPage() {
   return (
     <div className="space-y-6 keys">
       
+      <div className="flex max-[768px]:justify-center flex-col sm:flex-row items-center justify-between gap-2">
+        <h1 className="text-2xl font-bold text-text flex items-center gap-2">
+          <Key className="h-6 w-6" /> Keys
+        </h1>
+        <button
+          onClick={() => setShowCreate(true)}
+          className="flex justify-center items-center gap-2 px-4 py-2 bg-purple-600 text-text rounded hover:bg-purple-700 w-full sm:w-auto"
+        >
+          <Plus className="h-4 w-4" /> Generate Keys
+        </button>
+      </div>
 
       {/* Key Generation Modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 sm:px-0 h-screen max-[768px]:top-0" style={{scrollbarWidth : "none"}}>
-          <form onSubmit={handleCreate} className="bg-accent p-6 rounded-lg shadow-lg w-full max-w-md max-h-[95vh] overflow-y-scroll">
+        <div className="fixed inset-0 z-50 flex min-[768px]:items-center justify-center bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px] bg-opacity-60 px-2 sm:px-0 h-screen max-[768px]:top-0" >
+          <form onSubmit={handleCreate} className="bg-accent p-6 rounded-lg shadow-lg w-full max-w-md   max-h-[95vh] overflow-y-scroll" style={{scrollbarWidth : "none"}}>
             <h2 className="text-lg font-semibold text-text mb-2">Generate Keys</h2>
             <div>
               <label className="block text-sm ">Game</label>
@@ -357,12 +368,12 @@ export default function KeysPage() {
               </div>
               
            
-            <div className="flex justify-center flex-col sm:flex-row gap-2 max-[768px]:mt-16 max-h-[48px] mb-2">
+            <div className="flex justify-center flex-col sm:flex-row gap-2 max-[768px]:mt-8 min-[768px]:max-h-[48] max-h-[120px] mb-2">
               <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-3 rounded bg-gray-600 text-text hover:bg-gray-700">Cancel</button>
               <button type="submit" disabled={creating} className="px-4 py-2 rounded bg-purple-600 text-text hover:bg-purple-700 flex items-center justify-center">
                 {creating ? <Loader2 className="animate-spin h-5 w-5" /> : 'Generate'}
               </button>
-              <button type="button" disabled={creating} onClick={handleTrial} className="px-4 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center justify-center">1 Hr - Trial Key</button>
+              <button type="button" disabled={creating} onClick={handleTrial} className="px-4 py-2 rounded bg-blue-600 text-text hover:bg-blue-700 flex items-center justify-center ">1 Hr - Trial Key</button>
             </div>
           </form>
         </div>
@@ -374,7 +385,7 @@ export default function KeysPage() {
       {/* Bulk Actions */}
       {user.level < 3 && (
         <div className="flex justify-between max-[768px]:w-[calc(100vw-32px)] min-[768px]:flex-wrap min-[768px]:gap-3 mb-2 overflow-x-scroll max-[768px]:p-[.65rem_0] bulky  rounded max-[768px]:!text-[13px] " style={{ scrollbarWidth : "none"}}>
-          {/* <span className={`flex min-[768px]:gap-[16px] ${!generatedKeys.length > 0 && "!gap-3"} `}>
+          <span className={`flex min-[768px]:gap-[16px] ${!generatedKeys.length > 0 && "!gap-3"} `}>
             
             
             {generatedKeys.length > 0 && (
@@ -389,7 +400,7 @@ export default function KeysPage() {
                 </button>
               </>
             )}
-          </span> */}
+          </span>
           <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex justify-between w-full items-center min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px] ">
            <span className='flex min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px]'>
 
@@ -400,12 +411,7 @@ export default function KeysPage() {
               <span className="hidden sm:inline spbl">Extend</span>
             </button>
            </span>
-            <button
-          onClick={() => setShowCreate(true)}
-          className="flex justify-center items-center gap-2 px-4 py-2 bg-purple-600 text-text rounded hover:bg-purple-700 w-full sm:w-auto"
-        >
-          <Plus className="h-4 w-4" /> Generate Keys
-        </button>
+          
           </form>
         </div>
       )}
