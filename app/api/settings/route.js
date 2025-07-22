@@ -30,6 +30,8 @@ async function getSettings(req) {
           currency: functions.Currency || '$',
           prices: {
             hr1: functions.Hr1 || '1',
+            hr2: functions.Hr1 || '2',
+            hr5: functions.Hr1 || '5',
             days1: functions.Days1 || '1',
             days3: functions.Days3 || '2',
             days7: functions.Days7 || '4',
@@ -60,7 +62,7 @@ async function updateSettings(req) {
       `UPDATE function_code SET 
        Online = ?, Bullet = ?, Aimbot = ?, Memory = ?, 
        ModName = ?, Maintenance = ?, Currency = ?,
-       Hr1 = ?, Days1 = ?, Days3 = ?, Days7 = ?, Days30 = ?, Days60 = ?
+       Hr1 = ?, Hr2 = ?, Hr5 = ?, Days1 = ?, Days3 = ?, Days7 = ?, Days30 = ?, Days60 = ?
        WHERE id_path = 1`,
       [
         functions.online ? 'true' : 'false',
@@ -71,6 +73,8 @@ async function updateSettings(req) {
         functions.maintenance,
         functions.currency,
         functions.prices.hr1,
+        functions.prices.hr2,
+        functions.prices.hr5,
         functions.prices.days1,
         functions.prices.days3,
         functions.prices.days7,

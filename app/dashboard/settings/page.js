@@ -149,43 +149,43 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center justify-between p-3 bg-[var(--label)] rounded">
               <span className="text-white">Online Mode</span>
-              <button
-                type="button"
+              <a
+                
                 onClick={() => updateFunction('online', !settings.functions.online)}
-                className={`p-2 rounded ${settings.functions.online ? 'bg-green-600' : 'bg-gray-600'}`}
+                className={`p-2 rounded !bg-transparent ${settings.functions.online ? 'bg-green-600' : 'bg-gray-600'}`}
               >
-                {settings.functions.online ? <ToggleRight className="h-4 w-4 text-white" /> : <ToggleLeft className="h-4 w-4 text-white" />}
-              </button>
+                {settings.functions.online ? <ToggleRight className="h-10 w-10 text-white" /> : <ToggleLeft className="h-10 w-10 text-white" />}
+              </a>
             </div>
             <div className="flex items-center justify-between p-3 bg-[var(--label)] rounded">
               <span className="text-white">Bullet</span>
-              <button
+              <a
                 type="button"
                 onClick={() => updateFunction('bullet', !settings.functions.bullet)}
                 className={`p-2 rounded ${settings.functions.bullet ? 'bg-green-600' : 'bg-gray-600'}`}
               >
-                {settings.functions.bullet ? <ToggleRight className="h-4 w-4 text-white" /> : <ToggleLeft className="h-4 w-4 text-white" />}
-              </button>
+                {settings.functions.bullet ? <ToggleRight className="h-10 w-10 text-white" /> : <ToggleLeft className="h-10 w-10 text-white" />}
+              </a>
             </div>
             <div className="flex items-center justify-between p-3 bg-[var(--label)] rounded">
               <span className="text-white">Aimbot</span>
-              <button
+              <a
                 type="button"
                 onClick={() => updateFunction('aimbot', !settings.functions.aimbot)}
                 className={`p-2 rounded ${settings.functions.aimbot ? 'bg-green-600' : 'bg-gray-600'}`}
               >
-                {settings.functions.aimbot ? <ToggleRight className="h-4 w-4 text-white" /> : <ToggleLeft className="h-4 w-4 text-white" />}
-              </button>
+                {settings.functions.aimbot ? <ToggleRight className="h-10 w-10 text-white" /> : <ToggleLeft className="h-10 w-10 text-white" />}
+              </a>
             </div>
             <div className="flex items-center justify-between p-3 bg-[var(--label)] rounded">
               <span className="text-white">Memory</span>
-              <button
+              <a
                 type="button"
                 onClick={() => updateFunction('memory', !settings.functions.memory)}
                 className={`p-2 rounded ${settings.functions.memory ? 'bg-green-600' : 'bg-gray-600'}`}
               >
-                {settings.functions.memory ? <ToggleRight className="h-4 w-4 text-white" /> : <ToggleLeft className="h-4 w-4 text-white" />}
-              </button>
+                {settings.functions.memory ? <ToggleRight className="h-10 w-10 text-white" /> : <ToggleLeft className="h-10 w-10 text-white" />}
+              </a>
             </div>
           </div>
         </div>

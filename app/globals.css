@@ -10,7 +10,7 @@
   --accent: #18181B;
   --shadow: 0 2px 16px 0 rgba(0,0,0,0.7);
   --radius: 8px;
-  --label : #181818;
+  --label : oklch(0.38 0 0);
   --border-table : #262626;
   --text_input : #FAFAFA;
 }
@@ -61,7 +61,7 @@ a:hover {
   margin-bottom: 2rem;
 }
 .keys button, .keys button span , .keys .relative  svg.lucide-filter , .inp {
-  color: var(--label) !important;
+  color: var(--accent) !important;
   background: var(--text) !important;
 }
 button, .btn {
