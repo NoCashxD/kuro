@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth, useRole } from '../../context/AuthContext';
 import { ROLES, ROLE_LABELS } from '../../../roles';
-import { Key, Plus, Loader2, CheckCircle, XCircle, Trash2, RefreshCw, Clock, Edit2, Copy, Download } from 'lucide-react';
+import { Key, Plus, Loader2, CheckCircle, XCircle, Trash2, RefreshCw, Clock, Edit2, Copy, Download, Delete, Trash } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const GAME_OPTIONS = [
@@ -395,6 +395,10 @@ export default function KeysPage() {
               <RefreshCw className="h-4 w-4" />
               <span className="hidden sm:inline spbl">Extend</span>
             </button>
+                <button onClick={()=>handleBulk("delete")} className="flex justify-center items-center gap-2 px-4 py-2 bg-green-600 text-text rounded hover:bg-green-700">
+                  <Trash className="h-4 w-4" />
+                  <span className="hidden sm:inline spbl">Delete Keys</span>
+                </button>
            </span>
           
           </form>
