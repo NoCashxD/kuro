@@ -33,7 +33,7 @@ export default function TransferBalancePage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 bg-accent p-8 rounded-lg shadow-lg !border-none !border-none-gray-700 transfer">
+    <div className="max-w-full mx-auto mt-10 bg-accent p-8 rounded-lg shadow-lg !border-none !border-none-gray-700 transfer">
       <h1 className="text-2xl font-bold text-text mb-6">Transfer Balance</h1>
       <form onSubmit={handleTransfer} className="space-y-4 keys">
         <div>

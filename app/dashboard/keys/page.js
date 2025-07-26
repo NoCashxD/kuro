@@ -293,9 +293,7 @@ export default function KeysPage() {
     <div className="space-y-6 keys">
       
       <div className="flex max-[768px]:justify-center flex-col sm:flex-row items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold text-text flex items-center gap-2">
-          <Key className="h-6 w-6" /> Keys
-        </h1>
+        
         <button
           onClick={() => setShowCreate(true)}
           className="flex justify-center items-center gap-2 px-4 py-2 bg-purple-600 text-text rounded hover:bg-purple-700 w-full sm:w-auto"
@@ -384,7 +382,7 @@ export default function KeysPage() {
 
       {/* Bulk Actions */}
       {user.level < 3 && (
-        <div className="flex justify-between max-[768px]:w-[calc(100vw-32px)] min-[768px]:flex-wrap min-[768px]:gap-3 mb-2 overflow-x-scroll max-[768px]:p-[.65rem_0] bulky  rounded max-[768px]:!text-[13px] " style={{ scrollbarWidth : "none"}}>
+        <div className="flex justify-between max-[768px]:w-full min-[768px]:flex-wrap min-[768px]:gap-3 mb-2 overflow-x-scroll max-[768px]:p-[.65rem_0] bulky  rounded max-[768px]:!text-[13px] " style={{ scrollbarWidth : "none"}}>
           
           <form onSubmit={e => { e.preventDefault(); handleBulk('extend'); }} className="flex justify-between w-full items-center min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px] ">
            <span className='flex min-[768px]:gap-3 max-h-[48px] max-[768px]:gap-[12px]'>
@@ -402,7 +400,7 @@ export default function KeysPage() {
            </span>
           
           </form>
-         <span className={`flex min-[768px]:gap-[16px] ${!generatedKeys.length > 0 && "!gap-3"} `}>
+         <span className={`flex min-[768px]:gap-[16px] !gap-3`}>
             
             
             {generatedKeys.length > 0 && (
