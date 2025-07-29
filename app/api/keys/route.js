@@ -112,7 +112,7 @@ async function generateKeys(data, currentUser) {
       return NextResponse.json({ error: 'Game and duration are required' }, { status: 400 });
     }
     
-    // Determine owner based on current user
+    // Always determine the correct owner for price/currency
     let owner;
     if (currentUser.level === 1) {
       owner = currentUser.username;
@@ -120,7 +120,7 @@ async function generateKeys(data, currentUser) {
       owner = currentUser.owner;
     }
     
-    // Fetch prices and currency from function_code for the specific owner
+    // Fetch prices and currency from function_code for the correct owner
     const [functionCode] = await query('SELECT * FROM function_code WHERE owner = ? LIMIT 1', [owner]);
     if (!functionCode) {
       return NextResponse.json({ error: 'Owner settings not found. Please configure settings first.' }, { status: 400 });
@@ -204,7 +204,8 @@ async function generateKeys(data, currentUser) {
       success: true,
       message: `${quantity} key(s) generated successfully`,
       keys: generatedKeys,
-      cost: trial ? 0 : quantity * pricePerKey
+      cost: trial ? 0 : quantity * pricePerKey,
+      currency
     });
   } catch (error) {
     console.error('❌ Generate keys error:', error);
@@ -346,5 +347,5 @@ const handler = async (req) => {
 
 // Apply authentication and role-based access control
 // Level 2 (Admin) can manage keys
-export const GET = withAuthRoleAndOwner(2)(handler);
-export const POST = withAuthRoleAndOwner(2)(handler); 
+export const GET = withAuthRoleAndOwner(3)(handler);
+export const POST = withAuthRoleAndOwner(3)(handler); 
