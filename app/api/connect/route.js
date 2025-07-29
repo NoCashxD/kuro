@@ -29,7 +29,7 @@ async function handleConnect(req) {
       return NextResponse.json({}, { status: 200 });
     }
 
-    // Check maintenance mode
+    // Check maintenance mode for the specific owner
     const maintenance = await query('SELECT status FROM onoff WHERE owner = ? LIMIT 1', [ownername]);
     if (maintenance.length > 0 && maintenance[0].status === 'off') {
       console.log('System in maintenance mode');
@@ -83,12 +83,12 @@ async function handleConnect(req) {
       console.log('Device added:', serial);
     }
 
-    // Get function codes
-    const functionCodes = await query('SELECT * FROM function_code WHERE NoCASH = "NoCASH" AND id_path = 1 LIMIT 1');
+    // Get function codes for the specific owner
+    const functionCodes = await query('SELECT * FROM function_code WHERE owner = ? LIMIT 1', [ownername]);
     const functions = functionCodes.length > 0 ? functionCodes[0] : {};
     console.log('Function codes:', functions);
 
-    // Check if system is online
+    // Check if system is online for the specific owner
     if (functions.Online !== 'true') {
       console.log('System is offline');
       return NextResponse.json({
@@ -97,10 +97,12 @@ async function handleConnect(req) {
       }, { status: 200 });
     }
 
-    // Get mod name and credit info
-    const modNameData = await query('SELECT * FROM modname WHERE id = 1 LIMIT 1');
+    // Get mod name for the specific owner
+    const modNameData = await query('SELECT * FROM modname WHERE owner = ? LIMIT 1', [ownername]);
     const modName = modNameData.length > 0 ? modNameData[0].modname : 'NOCASH';
-    const ftextData = await query('SELECT * FROM _ftext WHERE id = 1 LIMIT 1');
+    
+    // Get credit info for the specific owner
+    const ftextData = await query('SELECT * FROM _ftext WHERE owner = ? LIMIT 1', [ownername]);
     const credit = ftextData.length > 0 ? ftextData[0].credit || '0' : '0';
 
     // Calculate expiration date if not set
