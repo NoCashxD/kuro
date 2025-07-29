@@ -98,8 +98,21 @@ async function generateKeys(data, currentUser) {
     if (!game || !duration) {
       return NextResponse.json({ error: 'Game and duration are required' }, { status: 400 });
     }
-    // Fetch prices and currency from function_code
-    const [functionCode] = await query('SELECT * FROM function_code LIMIT 1');
+    
+    // Determine owner based on current user
+    let owner;
+    if (currentUser.level === 1) {
+      owner = currentUser.username;
+    } else {
+      owner = currentUser.owner;
+    }
+    
+    // Fetch prices and currency from function_code for the specific owner
+    const [functionCode] = await query('SELECT * FROM function_code WHERE owner = ? LIMIT 1', [owner]);
+    if (!functionCode) {
+      return NextResponse.json({ error: 'Owner settings not found. Please configure settings first.' }, { status: 400 });
+    }
+    
     const prices = {
       hr1: Number(functionCode.Hr1) || 1,
       hr2: Number(functionCode.Hr2) || 2,
@@ -111,13 +124,7 @@ async function generateKeys(data, currentUser) {
       days60: Number(functionCode.Days60) || 12,
     };
     const currency = functionCode.Currency || '$';
-    // Determine owner based on current user
-    let owner;
-    if (currentUser.level === 1) {
-      owner = currentUser.username;
-    } else {
-      owner = currentUser.owner;
-    }
+    
     const generatedKeys = [];
     // Calculate duration in hours
     let durationHours = Number(duration);
@@ -131,6 +138,24 @@ async function generateKeys(data, currentUser) {
     // Determine price per key
     const priceKey = getPriceKey(durationHours);
     const pricePerKey = prices[priceKey] || 1;
+    
+    // Check balance before generating keys (except for trial)
+    if (!trial && (currentUser.level === 1 || currentUser.level === 2)) {
+      const [userData] = await query('SELECT saldo FROM users WHERE username = ?', [currentUser.username]);
+      if (!userData) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+      
+      const totalCost = quantity * pricePerKey;
+      if (userData.saldo < totalCost) {
+        return NextResponse.json({ 
+          error: 'Insufficient balance', 
+          required: totalCost, 
+          available: userData.saldo 
+        }, { status: 400 });
+      }
+    }
+    
     // Bulk generation
     for (let i = 0; i < quantity; i++) {
       let userKey;
@@ -155,15 +180,18 @@ async function generateKeys(data, currentUser) {
         owner
       );
     }
+    
     // Deduct balance for Owners/Admins (except trial)
     if (!trial && (currentUser.level === 1 || currentUser.level === 2)) {
       const cost = quantity * pricePerKey;
       await query('UPDATE users SET saldo = saldo - ? WHERE username = ?', [cost, currentUser.username]);
     }
+    
     return NextResponse.json({
       success: true,
       message: `${quantity} key(s) generated successfully`,
-      keys: generatedKeys
+      keys: generatedKeys,
+      cost: trial ? 0 : quantity * pricePerKey
     });
   } catch (error) {
     console.error('❌ Generate keys error:', error);
@@ -224,12 +252,31 @@ async function bulkOperation(data, currentUser) {
       case 'extend':
         let interval = extendHours;
         if (extendUnit === 'days') interval = extendHours * 24;
+        
+        // Check balance before extending keys (for Owners/Admins)
+        if (currentUser.level === 1 || currentUser.level === 2) {
+          const [userData] = await query('SELECT saldo FROM users WHERE username = ?', [currentUser.username]);
+          if (!userData) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+          }
+          
+          const totalCost = keyIds.length * interval; // 1 saldo per hour per key
+          if (userData.saldo < totalCost) {
+            return NextResponse.json({ 
+              error: 'Insufficient balance for extension', 
+              required: totalCost, 
+              available: userData.saldo 
+            }, { status: 400 });
+          }
+        }
+        
         // Only extend keys that have a non-NULL expired_date (i.e., have been used)
         const extendResult = await query(
           `UPDATE keys_code SET expired_date = DATE_ADD(expired_date, INTERVAL ? HOUR) WHERE id_keys IN (${keyIds.map(() => '?').join(',')}) AND expired_date IS NOT NULL ${ownerFilter}`,
           [interval, ...keyIds, ...ownerParams]
         );
         affectedRows = extendResult.affectedRows;
+        
         // Deduct balance for Owners/Admins
         if (currentUser.level === 1 || currentUser.level === 2) {
           const cost = keyIds.length * interval; // Example: 1 saldo per hour per key

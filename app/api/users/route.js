@@ -124,6 +124,37 @@ async function createNewUser(req) {
     });
     console.log('Created userId:', userId);
     
+    // If creating an owner (level 1), automatically create their settings
+    if (level === 1) {
+      try {
+        // Create default function_code settings for the new owner
+        await query(
+          `INSERT INTO function_code (Online, Bullet, Aimbot, Memory, ModName, Maintenance, Currency,
+           Hr1, Hr2, Hr5, Days1, Days3, Days7, Days30, Days60, owner, NoCASH) 
+           VALUES ('true', 'false', 'false', 'false', ?, '', '$', '1', '2', '5', '1', '2', '4', '8', '12', ?, ?)`,
+          [username, username, username]
+        );
+        
+        // Create default onoff settings for the new owner
+        await query(
+          'INSERT INTO onoff ( status, myinput, owner) VALUES ( ?, ?, ?)',
+          ['on', '', username]
+        );
+        
+        // Create default modname settings for the new owner
+        await query(
+          'INSERT INTO modname (modname, owner) VALUES (?, ?)',
+          [username, username]
+        );
+        
+        console.log(`Created default settings for new owner: ${username}`);
+      } catch (settingsError) {
+        console.error('Error creating default settings for new owner:', settingsError);
+        // Don't fail the user creation if settings creation fails
+        // The owner can configure settings later
+      }
+    }
+    
     // Log activity
     await logActivity(
       userId.toString(),
@@ -135,7 +166,8 @@ async function createNewUser(req) {
     return NextResponse.json({
       success: true,
       message: 'User created successfully',
-      userId
+      userId,
+      settingsCreated: level === 1
     });
   } catch (error) {
     console.error('❌ Create user error:', error);
