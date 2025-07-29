@@ -18,9 +18,9 @@ async function getUsers(req) {
       sql = 'SELECT * FROM users WHERE owner = ? OR uplink = ? ORDER BY created_at DESC';
       params = [user.username, user.username];
     } else if (user.level === 2) {
-      // Admin can only see resellers under their owner
-      sql = 'SELECT * FROM users WHERE owner = ? AND level = 3 ORDER BY created_at DESC';
-      params = [user.owner];
+      // Admin can only see resellers they created
+      sql = 'SELECT * FROM users WHERE uplink = ? AND level = 3 ORDER BY created_at DESC';
+      params = [user.username];
     } else {
       // Reseller can't see any users
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
@@ -201,8 +201,8 @@ async function deleteUser(req) {
       // Owner can delete admins/resellers they created, but not other owners or devs
       canDelete = (userToDelete.level > 1 && (userToDelete.owner === currentUser.username || userToDelete.uplink === currentUser.username));
     } else if (currentUser.level === 2) {
-      // Admin can only delete resellers under their owner
-      canDelete = (userToDelete.level === 3 && userToDelete.owner === currentUser.owner);
+      // Admin can only delete resellers they created
+      canDelete = (userToDelete.level === 3 && userToDelete.uplink === currentUser.username);
     }
     
     if (!canDelete) {
