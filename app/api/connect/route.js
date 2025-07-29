@@ -30,7 +30,7 @@ async function handleConnect(req) {
     }
 
     // Check maintenance mode
-    const maintenance = await query('SELECT status FROM onoff WHERE id = 11 LIMIT 1');
+    const maintenance = await query('SELECT status FROM onoff WHERE owner = ? LIMIT 1', [ownername]);
     if (maintenance.length > 0 && maintenance[0].status === 'off') {
       console.log('System in maintenance mode');
       return NextResponse.json({}, { status: 200 });

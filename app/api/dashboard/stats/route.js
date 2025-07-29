@@ -13,10 +13,24 @@ async function getStats(req) {
     const user = req.user;
     let ownerFilter = '';
     let ownerParams = [];
+    let targetOwner = '';
     
-    if (user.level !== 1) {
+    // Determine which owner's data to show
+    if (user.level === 1) {
+      // Owner sees their own data
+      targetOwner = user.username;
       ownerFilter = 'WHERE owner = ?';
-      ownerParams = [user.owner];
+      ownerParams = [targetOwner];
+    } else if (user.level === 0) {
+      // Main can see all data (no filter)
+      targetOwner = 'ALL';
+      ownerFilter = '';
+      ownerParams = [];
+    } else {
+      // Admin/Reseller sees their owner's data
+      targetOwner = user.owner;
+      ownerFilter = 'WHERE owner = ?';
+      ownerParams = [targetOwner];
     }
 
     // Total keys
@@ -80,13 +94,23 @@ async function getStats(req) {
       ownerParams
     );
 
-    // System status
-    const systemStatusResult = await query('SELECT status FROM onoff WHERE id = 11 LIMIT 1');
-    const systemStatus = systemStatusResult.length > 0 ? systemStatusResult[0].status : 'on';
+    // System status - get the correct owner's status
+    let systemStatus = 'on';
+    if (targetOwner !== 'ALL') {
+      const systemStatusResult = await query('SELECT status FROM onoff WHERE owner = ? LIMIT 1', [targetOwner]);
+      systemStatus = systemStatusResult.length > 0 ? systemStatusResult[0].status : 'on';
+    }
 
-    // Function codes
-    const functionCodesResult = await query('SELECT * FROM function_code LIMIT 1');
-    const functionCodes = functionCodesResult.length > 0 ? functionCodesResult[0] : {};
+    // Function codes - get the correct owner's settings
+    let functionCodes = {};
+    if (targetOwner !== 'ALL') {
+      const functionCodesResult = await query('SELECT * FROM function_code WHERE owner = ? LIMIT 1', [targetOwner]);
+      functionCodes = functionCodesResult.length > 0 ? functionCodesResult[0] : {};
+    } else {
+      // For main user, get the first available settings as default
+      const functionCodesResult = await query('SELECT * FROM function_code LIMIT 1');
+      functionCodes = functionCodesResult.length > 0 ? functionCodesResult[0] : {};
+    }
     
     return NextResponse.json({
       success: true,
@@ -114,7 +138,8 @@ async function getStats(req) {
             memory: functionCodes.Memory === 'true'
           },
           modName: functionCodes.ModName || 'NOCASH'
-        }
+        },
+        owner: targetOwner
       }
     });
   } catch (error) {

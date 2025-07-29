@@ -127,19 +127,6 @@ export default function SettingsPage() {
                 <option value="off">Offline (Maintenance)</option>
               </select>
             </div>
-            <div>
-              <label className="block text-sm  mb-2">Maintenance Message</label>
-              <input
-                type="text"
-                value={settings.system.maintenanceMessage}
-                onChange={(e) => setSettings(prev => ({
-                  ...prev,
-                  system: { ...prev.system, maintenanceMessage: e.target.value }
-                }))}
-                className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
-                placeholder="System is under maintenance..."
-              />
-            </div>
           </div>
         </div>
 
