@@ -82,26 +82,25 @@ export default function KeysPage() {
   const [prices, setPrices] = useState({});
   const [currency, setCurrency] = useState('$');
 
-  // Fetch prices and currency from settings
+  // Fetch prices and currency from keys API
   useEffect(() => {
-    async function fetchSettings() {
+    async function fetchKeysWithPrices() {
       try {
-        const res = await fetch('/api/settings');
+        const res = await fetch('/api/keys');
         const data = await res.json();
         if (data.success) {
-          setPrices(data.settings.functions.prices || {});
-          setCurrency(data.settings.functions.currency || '$');
+          setKeys(data.keys || []);
+          setPrices(data.prices || {});
+          setCurrency(data.currency || '$');
         }
       } catch (e) {
         // ignore
       }
     }
-    fetchSettings();
+    fetchKeysWithPrices();
   }, []);
 
-  useEffect(() => {
-    fetchKeys();
-  }, []);
+
 
   useEffect(() => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
@@ -117,7 +116,14 @@ export default function KeysPage() {
       const url = q ? `/api/keys?q=${encodeURIComponent(q)}` : '/api/keys';
       const res = await fetch(url);
       const data = await res.json();
-      if (data.success) setKeys(data.keys);
+      if (data.success) {
+        setKeys(data.keys);
+        // Update prices and currency if available (only on initial load)
+        if (!q) {
+          setPrices(data.prices || {});
+          setCurrency(data.currency || '$');
+        }
+      }
     } catch (e) {
       toast.error('Failed to fetch keys');
     } finally {

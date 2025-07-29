@@ -80,6 +80,27 @@ async function getKeys(req) {
     sql += ' ORDER BY created_at DESC';
     const keys = await query(sql, params);
 
+    // Get prices and currency for the correct owner
+    let owner;
+    if (user.level === 1) {
+      owner = user.username;
+    } else {
+      owner = user.owner;
+    }
+    
+    const [functionCode] = await query('SELECT * FROM function_code WHERE owner = ? LIMIT 1', [owner]);
+    const prices = functionCode ? {
+      hr1: Number(functionCode.Hr1) || 1,
+      hr2: Number(functionCode.Hr2) || 2,
+      hr5: Number(functionCode.Hr5) || 5,
+      days1: Number(functionCode.Days1) || 1,
+      days3: Number(functionCode.Days3) || 2,
+      days7: Number(functionCode.Days7) || 4,
+      days30: Number(functionCode.Days30) || 8,
+      days60: Number(functionCode.Days60) || 12,
+    } : {};
+    const currency = functionCode?.Currency || '$';
+
     return NextResponse.json({
       success: true,
       keys: keys.map(key => ({
@@ -95,7 +116,9 @@ async function getKeys(req) {
         owner: key.owner,
         created_at: key.created_at,
         generated_by: key.registrator
-      }))
+      })),
+      prices,
+      currency
     });
   } catch (error) {
     console.error('❌ Get keys error:', error);
