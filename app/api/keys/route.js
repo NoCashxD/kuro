@@ -40,6 +40,7 @@ async function getKeys(req) {
     } else if (url && url.searchParams) {
       search = url.searchParams.get('q') || '';
     }
+
     let sql, params;
     if (user.level === 0) {
       sql = 'SELECT * FROM keys_code';
@@ -48,12 +49,23 @@ async function getKeys(req) {
       sql = 'SELECT * FROM keys_code WHERE owner = ?';
       params = [user.username];
     } else if (user.level === 2) {
-      sql = 'SELECT * FROM keys_code WHERE owner = ?';
-      params = [user.owner];
+      sql = `
+        SELECT * FROM keys_code
+        WHERE owner = ?
+        AND (
+          registrator = ?
+          OR registrator IN (
+            SELECT username FROM users WHERE uplink = ? AND level = 3
+          )
+        )
+      `;
+      params = [user.owner, user.username, user.username];
     } else {
+      // Reseller
       sql = 'SELECT * FROM keys_code WHERE registrator = ?';
       params = [user.username];
     }
+
     // Add search filter if present
     if (search) {
       const like = `%${search}%`;
@@ -67,6 +79,7 @@ async function getKeys(req) {
     }
     sql += ' ORDER BY created_at DESC';
     const keys = await query(sql, params);
+
     return NextResponse.json({
       success: true,
       keys: keys.map(key => ({

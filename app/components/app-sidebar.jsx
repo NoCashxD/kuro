@@ -169,9 +169,9 @@ export function AppSidebar({
     { name: 'Manage Users', href: '/dashboard/users', icon: Users, level: 2 }, // Only Admin and above can see Users
     ...(user.level <= 2 ? [{ name: 'Transfer Balance', href: '/dashboard/users/transfer-balance', icon: Key, level: 2 }] : []),
     { name: 'Online Functions', href: '/dashboard/settings', icon: Settings, level: 1 },
-    { name: 'History', href: '/dashboard/history', icon: FileText, level: 2 },
-    { name: 'Check Statistics', href: '/dashboard/stats', icon: BarChart3, level: 2 },
-    { name: 'File Manager', href: '/dashboard/file-manager', icon: Folder, level: 3 },
+    { name: 'History', href: '/dashboard/history', icon: FileText, level: 1 },
+    { name: 'Check Statistics', href: '/dashboard/stats', icon: BarChart3, level: 1 },
+    { name: 'File Manager', href: '/dashboard/file-manager', icon: Folder, level: 1 },
   ].filter(item => user.level <= item.level);
   return (
     <Sidebar collapsible="icon" {...props} >
