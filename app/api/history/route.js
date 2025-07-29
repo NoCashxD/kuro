@@ -11,23 +11,33 @@ async function getHistory(req) {
     const offset = (page - 1) * limit;
     
     let sql, countSql, params;
+    let targetOwner = '';
     
+    // Determine which owner's data to show
     if (user.level === 1) {
-      // Owner can see all history - optimized query with proper indexing
+      // Owner sees their own history data
+      targetOwner = user.username;
+      sql = 'SELECT id_history, keys_id, user_do, info, owner, created_at FROM history WHERE owner = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
+      countSql = 'SELECT COUNT(*) as total FROM history WHERE owner = ?';
+      params = [targetOwner, limit, offset];
+    } else if (user.level === 0) {
+      // Main can see all history (no filter)
+      targetOwner = 'ALL';
       sql = 'SELECT id_history, keys_id, user_do, info, owner, created_at FROM history ORDER BY created_at DESC LIMIT ? OFFSET ?';
       countSql = 'SELECT COUNT(*) as total FROM history';
       params = [limit, offset];
     } else {
-      // Admin/Reseller can only see history from their owner hierarchy - optimized query
+      // Admin/Reseller can only see history from their owner hierarchy
+      targetOwner = user.owner;
       sql = 'SELECT id_history, keys_id, user_do, info, owner, created_at FROM history WHERE owner = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
       countSql = 'SELECT COUNT(*) as total FROM history WHERE owner = ?';
-      params = [user.owner, limit, offset];
+      params = [targetOwner, limit, offset];
     }
     
     // Execute queries in parallel for better performance
     const [history, countResult] = await Promise.all([
       query(sql, params),
-      query(countSql, user.level === 1 ? [] : [user.owner])
+      query(countSql, user.level === 0 ? [] : [targetOwner])
     ]);
     
     const total = countResult[0].total;
@@ -47,7 +57,8 @@ async function getHistory(req) {
         limit,
         total,
         pages: Math.ceil(total / limit)
-      }
+      },
+      owner: targetOwner
     });
   } catch (error) {
     console.error('Get history error:', error);
