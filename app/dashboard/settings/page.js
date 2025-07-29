@@ -233,7 +233,7 @@ export default function SettingsPage() {
               <label className="block text-sm  mb-2">2 Hour</label>
               <input
                 type="number"
-                value={settings.functions.prices.hr1}
+                value={settings.functions.prices.hr2}
                 onChange={(e) => updatePrice('hr2', e.target.value)}
                 className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
               />
@@ -242,8 +242,8 @@ export default function SettingsPage() {
               <label className="block text-sm  mb-2">5 Hour</label>
               <input
                 type="number"
-                value={settings.functions.prices.hr1}
-                onChange={(e) => updatePrice('hr1', e.target.value)}
+                value={settings.functions.prices.hr5}
+                onChange={(e) => updatePrice('hr5', e.target.value)}
                 className="w-full p-2 rounded bg-[var(--label)] text-white !border-none !border-none-gray-600"
               />
             </div>
