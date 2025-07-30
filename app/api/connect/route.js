@@ -127,6 +127,7 @@ async function handleConnect(req) {
       data: {
         token: token,
         rng: Math.floor(new Date(expiredDate).getTime() / 1000), // Unix timestamp
+        EXP : Math.floor(new Date(expiredDate).getTime() / 1000),
         credit: credit,
         modname: modName
       }
