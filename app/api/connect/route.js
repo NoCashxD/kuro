@@ -2,6 +2,75 @@ import { NextResponse } from 'next/server';
 import { query } from '../../../lib/db.js';
 import { CONNECT_API_STATIC } from '../../../lib/auth.js';
 import CryptoJS from 'crypto-js';
+import crypto from 'crypto';
+
+// Server private key (should be stored securely in production)
+const SERVER_PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC24XkiFVXMRjFZ
+CXJfZCpS/3DRIAcwnip6cWkrbhhuJ26iJfat+vR3BJfQly6f8pwge9w3xcjsd3/0
+5rx9n8vdGyTmb1azrDMe2lZRL2q7zR6+EOvVtKEXCa+e8AV5cNcDhn5WK9bb4yOk
+l+FcDTVWvkszOnq7gyGR/U2UOXzczsmG5mrPRUX4E6vO3K6gJbxNDsRlkONYJB7r
+bFQztw7Raf5D7SanbuzVjs4doMNkLGl7Cl81juf1BlkRv/uk/K1kHK1pqH1tZe9o
+FJu0eX4lWMBI1bVAwDOKLe7yK2dvttqJ5Jx7nwhSXQB/rFPQePp+gDxdu4WOqdzl
+LVgM5XhxAgMBAAECggEAL/8c+4T97468hNGl4sM3GHFR+pCdUnUwUNJS98L9Rmuy
+7XtpMmAaqOHbtjL3WaMitqPLOBgAk48JVgz4iz/VEUJ+fLvb1WvsPryuyr/XE1LS
+Lq/iNUQiwxkXrm7wAN9MjvBNV/BJg4wpXpk93BrbVNi8g8VlULEprlb8dVphGtH5
+HR4552yOpWS51+P1qtPRxSFDYhtPX4eilMAQMOCIZ8d+lKFCQbxPhDBuGVLmPBlt
+ONAkdA+in88pXiWTisA58gEsn/sk133aLtKlGCOVG6BGaib0gcNtVE3V2/3i/kao
+ojfXWZrOg8k0o2aNzhskWqxiF2nkoggl3sDkLwwBwQKBgQDaznMENjTPOPqKPwBc
+eYzEHF06j8KYJSServcSst7mUumvPAodGsMtMqh3n4BqwtxEKyTCn2Si7b0FtIck
+SsvlRQvZtwBWH/UHVSFltih+hTQRYWaFZHMHX/LYrFlE6Zkv8rHQTJeYBfo8ncms
+ZXZpy3Hqet4wnTJD3Y1bHoh1swKBgQDV96/IoJavKBFIqs2XtKAqEPnOXoRyzqMS
+RP3f2iLLu/FUkNHJ6/KyDhA3Y62RzGvejSNUmxrt4K5l+qXiTUZh7SEKc+kYBbiP
+xhQED89A4zfxMJUSM5SgvP8pp2b8t4FYD+2YP223wt1IGa57xOTC3D4767xKDKm6
+RD/5XCSPSwKBgAVMaIaalW7LL233lpemrdz13uATKSAsDhX1oLAIOtOTAGuo5YnM
+4xsOFfxHlYGAVHsmHE7GM1aqsSAZPgiH8yYLJP1RrCVpwrI5woRHA/YEXb1qAWSL
+iSmNjkDm84Zyra32j42+vREGXAfpvj95eYOYVJrb/NNqixQPomOpep53AoGBAL+N
+GSqkUaIHXcnPV3Ub+FMQlYLh7PMW+LhPWXSAxavc2oUZjSaW+9PZcT0VGHsxJdS8
+R8fjf607+wVC6iT5hyv97Rl9gUzHOl5ENwEX4jQ19owPMTV1RfbMnCZ/Ply6L6pV
+wCAPkLr1UcLNcv5M23tzTqe4N/2W7o/Zr+geTICXAoGBAJaMXVlupe0tC1BNQfio
+P9T2SsjUTdWeyUFHdLRZJjfy9mHzeyELYgL6CcwwTAFyMcUfwDznlX9tLYqWvlpR
+KWSMRd8EQIjSf4t4GAlGE1o4NcN/C8zOARzqek+iqan8UepVqrh5xFPKDzq6Fw8m
+SML7tM0ng970IVzHh+fnUMQ8
+-----END PRIVATE KEY-----`;
+
+// Function to decrypt client requests
+function decryptRequest(encryptedData) {
+  try {
+    const privateKey = crypto.createPrivateKey(SERVER_PRIVATE_KEY);
+    const buffer = Buffer.from(encryptedData, 'base64');
+    const decrypted = crypto.privateDecrypt(
+      {
+        key: privateKey,
+        padding: crypto.constants.RSA_PKCS1_PADDING,
+      },
+      buffer
+    );
+    return JSON.parse(decrypted.toString());
+  } catch (error) {
+    console.error('Decryption failed:', error);
+    return null;
+  }
+}
+
+// Function to encrypt server responses
+function encryptResponse(responseData) {
+  try {
+    const responseJson = JSON.stringify(responseData);
+    const publicKey = crypto.createPublicKey(SERVER_PRIVATE_KEY);
+    const encrypted = crypto.publicEncrypt(
+      {
+        key: publicKey,
+        padding: crypto.constants.RSA_PKCS1_PADDING,
+      },
+      Buffer.from(responseJson)
+    );
+    return encrypted.toString('base64');
+  } catch (error) {
+    console.error('Encryption failed:', error);
+    return null;
+  }
+}
 
 async function handleConnect(req) {
   try {
@@ -15,18 +84,37 @@ async function handleConnect(req) {
     if (!ownername) {
       return NextResponse.json({ error: 'Owner not specified in query' }, { status: 400 });
     }
+
     // Parse form data (matching C++ client format)
     const formData = await req.formData();
     const game = formData.get('game');
-    const userKey = formData.get('user_key');
+    const encryptedData = formData.get('user_key'); // Encrypted data from client
     const serial = formData.get('serial');
 
-    console.log('Incoming POST:', { game, userKey, serial });
+    console.log('Incoming encrypted POST:', { game, encryptedData: encryptedData ? 'present' : 'missing', serial });
 
     // Validate required fields
-    if (!game || !userKey || !serial) {
+    if (!game || !encryptedData || !serial) {
       console.log('Missing required fields');
       return NextResponse.json({}, { status: 200 });
+    }
+
+    // Decrypt the client request
+    const decryptedData = decryptRequest(encryptedData);
+    if (!decryptedData) {
+      console.log('Failed to decrypt request');
+      return NextResponse.json({ error: 'Invalid request format' }, { status: 400 });
+    }
+
+    const { userKey, uuid, timestamp, nonce } = decryptedData;
+
+    console.log('Decrypted request:', { userKey, uuid, timestamp, nonce });
+
+    // Validate timestamp (prevent replay attacks)
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (Math.abs(currentTime - timestamp) > 300) { // 5 minutes tolerance
+      console.log('Request timestamp too old or in future');
+      return NextResponse.json({ error: 'Invalid timestamp' }, { status: 400 });
     }
 
     // Check maintenance mode for the specific owner
@@ -91,10 +179,13 @@ async function handleConnect(req) {
     // Check if system is online for the specific owner
     if (functions.Online !== 'true') {
       console.log('System is offline');
-      return NextResponse.json({
+      const errorResponse = {
         status: false,
-        reason: functions.Maintenance || 'System offline'
-      }, { status: 200 });
+        reason: functions.Maintenance || 'System offline',
+        request_timestamp: timestamp
+      };
+      const encryptedError = encryptResponse(errorResponse);
+      return NextResponse.json({ encrypted_data: encryptedError }, { status: 200 });
     }
 
     // Get mod name for the specific owner
@@ -121,19 +212,35 @@ async function handleConnect(req) {
     const authString = `${game}-${userKey}-${serial}-${CONNECT_API_STATIC}`;
     const token = CryptoJS.MD5(authString).toString();
 
-    // Prepare response matching C++ client expectations
+    // Generate server signature for additional security
+    const signatureData = `${token}-${Math.floor(new Date(expiredDate).getTime() / 1000)}-${CONNECT_API_STATIC}`;
+    const serverSignature = CryptoJS.SHA256(signatureData).toString();
+
+    // Prepare encrypted response matching C++ client expectations
     const responseData = {
       status: true,
       data: {
         token: token,
         rng: Math.floor(new Date(expiredDate).getTime() / 1000), // Unix timestamp
-        EXP : Math.floor(new Date(expiredDate).getTime() / 1000),
+        EXP: Math.floor(new Date(expiredDate).getTime() / 1000),
         credit: credit,
         modname: modName
-      }
+      },
+      server_signature: serverSignature,
+      request_timestamp: timestamp,
+      nocashhost: true,
+      connect: true
     };
-    console.log('Returning success:', responseData);
-    return NextResponse.json(responseData, { status: 200 });
+
+    // Encrypt the response
+    const encryptedResponse = encryptResponse(responseData);
+    if (!encryptedResponse) {
+      console.error('Failed to encrypt response');
+      return NextResponse.json({ error: 'Encryption failed' }, { status: 500 });
+    }
+
+    console.log('Returning encrypted success response');
+    return NextResponse.json({ encrypted_data: encryptedResponse }, { status: 200 });
 
   } catch (error) {
     console.error('Connect API error:', error);

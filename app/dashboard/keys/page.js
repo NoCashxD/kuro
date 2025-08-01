@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useAuth, useRole } from '../../context/AuthContext';
-import { ROLES, ROLE_LABELS } from '../../../roles';
+import { ROLES, ROLE_LABELS } from '../../../roles.js';
 import { Key, Plus, Loader2, CheckCircle, XCircle, Trash2, RefreshCw, Clock, Edit2, Copy, Download, Delete, Trash } from 'lucide-react';
 import toast from 'react-hot-toast';
 

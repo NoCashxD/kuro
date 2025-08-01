@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { ROLES, ROLE_LABELS } from '../../roles';
+import { ROLES, ROLE_LABELS } from '../../roles.js';
 
 const AuthContext = createContext();
 
