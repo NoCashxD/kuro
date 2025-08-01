@@ -5,7 +5,7 @@ import CryptoJS from 'crypto-js';
 import crypto from 'crypto';
 
 // AES encryption key (should be stored securely in production)
-const AES_KEY = "nocashhost_secret_key_32_bytes_long!!"; // Same key as client
+const AES_KEY = "nocashhost_secret_key_32_byte"; // Same key as client
 
 // Function to decrypt client requests using AES-256-GCM
 function decryptRequest(encryptedData) {
