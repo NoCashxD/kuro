@@ -7,21 +7,19 @@ import crypto from 'crypto';
 // AES encryption key (should be stored securely in production)
 const AES_KEY = "nocashhost_secret_key_32_bytes!!"; // Same key as client
 
-// Function to decrypt client requests using AES-256-GCM
+// Function to decrypt client requests using AES-256-CBC
 function decryptRequest(encryptedData) {
   try {
     console.log('Attempting to decrypt AES data:', encryptedData ? encryptedData.substring(0, 50) + '...' : 'null');
     
     const buffer = Buffer.from(encryptedData, 'base64');
     
-    // Extract IV (first 12 bytes) and tag (last 16 bytes)
-    const iv = buffer.slice(0, 12);
-    const tag = buffer.slice(buffer.length - 16);
-    const ciphertext = buffer.slice(12, buffer.length - 16);
+    // Extract IV (first 16 bytes) and ciphertext
+    const iv = buffer.slice(0, 16);
+    const ciphertext = buffer.slice(16);
     
-    // Decrypt using AES-256-GCM with IV
-    const decipher = crypto.createDecipheriv('aes-256-gcm', Buffer.from(AES_KEY), iv);
-    decipher.setAuthTag(tag);
+    // Decrypt using AES-256-CBC with IV
+    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(AES_KEY), iv);
     
     let decrypted = decipher.update(ciphertext, null, 'utf8');
     decrypted += decipher.final('utf8');
@@ -35,26 +33,23 @@ function decryptRequest(encryptedData) {
   }
 }
 
-// Function to encrypt server responses using AES-256-GCM
+// Function to encrypt server responses using AES-256-CBC
 function encryptResponse(responseData) {
   try {
     console.log('Encrypting AES response:', responseData);
     const responseJson = JSON.stringify(responseData);
     
-    // Generate random IV
-    const iv = crypto.randomBytes(12);
+    // Generate random IV (16 bytes for AES-CBC)
+    const iv = crypto.randomBytes(16);
     
-    // Encrypt using AES-256-GCM with IV
-    const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(AES_KEY), iv);
+    // Encrypt using AES-256-CBC with IV
+    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(AES_KEY), iv);
     
     let encrypted = cipher.update(responseJson, 'utf8', 'base64');
     encrypted += cipher.final('base64');
     
-    // Get the auth tag
-    const tag = cipher.getAuthTag();
-    
-    // Combine IV + encrypted data + tag
-    const result = iv.toString('base64') + encrypted + tag.toString('base64');
+    // Combine IV + encrypted data
+    const result = iv.toString('base64') + encrypted;
     console.log('Successfully encrypted AES response, length:', result.length);
     return result;
   } catch (error) {
