@@ -106,6 +106,12 @@ async function handleConnect(req, { params }) {
     const game = formData.get('game');
     const encryptedData = formData.get('user_key'); // Encrypted data from client
     const serial = formData.get('serial');
+    
+    // Debug: Log all form fields
+    console.log('All form fields:');
+    for (const [key, value] of formData.entries()) {
+      console.log(`  ${key}: ${value}`);
+    }
 
     console.log('Form data received:', { 
       game: game || 'MISSING', 
@@ -116,10 +122,25 @@ async function handleConnect(req, { params }) {
     // Validate required fields
     if (!game || !encryptedData || !serial) {
       console.log('ERROR: Missing required fields');
+      
+      // Get all form fields for debugging
+      const allFields = {};
+      for (const [key, value] of formData.entries()) {
+        allFields[key] = value;
+      }
+      
       return NextResponse.json({ 
         status: false, 
         error: 'Missing required fields',
-        debug: { game: !!game, encryptedData: !!encryptedData, serial: !!serial }
+        debug: { 
+          game: !!game, 
+          encryptedData: !!encryptedData, 
+          serial: !!serial,
+          allFields: allFields,
+          receivedGame: game,
+          receivedSerial: serial,
+          encryptedDataLength: encryptedData ? encryptedData.length : 0
+        }
       }, { status: 200 });
     }
 
