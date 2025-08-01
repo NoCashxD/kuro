@@ -146,6 +146,13 @@ async function handleConnect(req, { params }) {
     const decryptedData = decryptRequest(encryptedData);
     if (!decryptedData) {
       console.log('ERROR: Failed to decrypt request');
+      
+      // Get all form fields for debugging
+      const allFields = {};
+      for (const [key, value] of formData.entries()) {
+        allFields[key] = value;
+      }
+      
       return NextResponse.json({ 
         status: false, 
         error: 'Invalid request format',
@@ -153,7 +160,10 @@ async function handleConnect(req, { params }) {
         serverDebug: {
           encryptedDataLength: encryptedData ? encryptedData.length : 0,
           encryptedDataPreview: encryptedData ? encryptedData.substring(0, 50) + '...' : 'null',
-          allFields: Object.fromEntries(formData.entries())
+          allFields: allFields,
+          hasSerial: !!formData.get('serial'),
+          hasGame: !!formData.get('game'),
+          hasUserKey: !!formData.get('user_key')
         }
       }, { status: 400 });
     }
