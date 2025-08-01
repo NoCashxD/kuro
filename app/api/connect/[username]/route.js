@@ -20,6 +20,9 @@ function decryptRequest(encryptedData) {
       decrypted += String.fromCharCode(buffer[i] ^ AES_KEY.charCodeAt(i % AES_KEY.length));
     }
     
+    // Debug: Log the decrypted data
+    console.log('Decrypted data preview:', decrypted.substring(0, 100));
+    
     const result = JSON.parse(decrypted);
     console.log('✅ Successfully decrypted XOR request:', result);
     return result;
