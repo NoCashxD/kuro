@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { query } from '../../../lib/db.js';
-import { CONNECT_API_STATIC } from '../../../lib/auth.js';
+import { query } from '../../../../lib/db.js';
+import { CONNECT_API_STATIC } from '../../../../lib/auth.js';
 import CryptoJS from 'crypto-js';
 import crypto from 'crypto';
 
@@ -44,7 +44,8 @@ function decryptRequest(encryptedData) {
     const decrypted = crypto.privateDecrypt(
       {
         key: privateKey,
-        padding: crypto.constants.RSA_PKCS1_PADDING,
+        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+        oaepHash: 'sha1',
       },
       buffer
     );
@@ -62,11 +63,13 @@ function encryptResponse(responseData) {
   try {
     console.log('Encrypting response:', responseData);
     const responseJson = JSON.stringify(responseData);
-    const publicKey = crypto.createPublicKey(SERVER_PRIVATE_KEY);
+    const privateKey = crypto.createPrivateKey(SERVER_PRIVATE_KEY);
+    const publicKey = crypto.createPublicKey(privateKey);
     const encrypted = crypto.publicEncrypt(
       {
         key: publicKey,
-        padding: crypto.constants.RSA_PKCS1_PADDING,
+        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+        oaepHash: 'sha1',
       },
       Buffer.from(responseJson)
     );
@@ -79,27 +82,22 @@ function encryptResponse(responseData) {
   }
 }
 
-async function handleConnect(req) {
+async function handleConnect(req, { params }) {
   try {
     console.log('=== CONNECT API CALLED ===');
     console.log('Request method:', req.method);
     console.log('Request URL:', req.url);
     
-    // Extract owner username from query string
-    const url = req.nextUrl || req.url;
-    let ownername = null;
-    if (url) {
-      const parsedUrl = typeof url === 'string' ? new URL(url, 'http://localhost') : url;
-      ownername = parsedUrl.searchParams ? parsedUrl.searchParams.get('username') : parsedUrl.searchParams.get('username');
-    }
+    // Extract owner username from URL params
+    const ownername = params.username;
     console.log('Owner name:', ownername);
     
     if (!ownername) {
-      console.log('ERROR: Owner not specified in query');
+      console.log('ERROR: Owner not specified in URL path');
       return NextResponse.json({ 
         status: false, 
-        error: 'Owner not specified in query',
-        debug: 'Missing username parameter'
+        error: 'Owner not specified in URL path',
+        debug: 'Missing username in path'
       }, { status: 400 });
     }
 
@@ -291,7 +289,7 @@ async function handleConnect(req) {
   }
 }
 
-export async function GET(req) {
+export async function GET(req, { params }) {
   const webInfo = {
     web_info: {
       _client: "Kuro Panel",
