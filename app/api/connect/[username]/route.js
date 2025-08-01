@@ -46,9 +46,9 @@ function encryptResponse(responseData) {
       encrypted += String.fromCharCode(responseJson.charCodeAt(i) ^ AES_KEY.charCodeAt(i % AES_KEY.length));
     }
     
-    const result = Buffer.from(encrypted).toString('base64');
-    console.log('Successfully encrypted XOR response, length:', result.length);
-    return result;
+    // Send the encrypted data directly (not base64 encoded) to match client expectations
+    console.log('Successfully encrypted XOR response, length:', encrypted.length);
+    return encrypted;
   } catch (error) {
     console.error('XOR encryption failed:', error.message);
     return null;
