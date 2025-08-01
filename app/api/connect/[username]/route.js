@@ -151,7 +151,12 @@ async function handleConnect(req, { params }) {
       return NextResponse.json({ 
         status: false, 
         error: 'Invalid request format',
-        debug: 'Decryption failed'
+        debug: 'Decryption failed',
+        serverDebug: {
+          encryptedDataLength: encryptedData ? encryptedData.length : 0,
+          encryptedDataPreview: encryptedData ? encryptedData.substring(0, 50) + '...' : 'null',
+          allFields: Object.fromEntries(formData.entries())
+        }
       }, { status: 400 });
     }
 
