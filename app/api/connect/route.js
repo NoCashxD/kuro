@@ -37,6 +37,8 @@ SML7tM0ng970IVzHh+fnUMQ8
 // Function to decrypt client requests
 function decryptRequest(encryptedData) {
   try {
+    console.log('Attempting to decrypt:', encryptedData ? encryptedData.substring(0, 50) + '...' : 'null');
+    
     const privateKey = crypto.createPrivateKey(SERVER_PRIVATE_KEY);
     const buffer = Buffer.from(encryptedData, 'base64');
     const decrypted = crypto.privateDecrypt(
@@ -46,9 +48,11 @@ function decryptRequest(encryptedData) {
       },
       buffer
     );
-    return JSON.parse(decrypted.toString());
+    const result = JSON.parse(decrypted.toString());
+    console.log('Successfully decrypted request:', result);
+    return result;
   } catch (error) {
-    console.error('Decryption failed:', error);
+    console.error('Decryption failed:', error.message);
     return null;
   }
 }
@@ -56,6 +60,7 @@ function decryptRequest(encryptedData) {
 // Function to encrypt server responses
 function encryptResponse(responseData) {
   try {
+    console.log('Encrypting response:', responseData);
     const responseJson = JSON.stringify(responseData);
     const publicKey = crypto.createPublicKey(SERVER_PRIVATE_KEY);
     const encrypted = crypto.publicEncrypt(
@@ -65,15 +70,21 @@ function encryptResponse(responseData) {
       },
       Buffer.from(responseJson)
     );
-    return encrypted.toString('base64');
+    const result = encrypted.toString('base64');
+    console.log('Successfully encrypted response, length:', result.length);
+    return result;
   } catch (error) {
-    console.error('Encryption failed:', error);
+    console.error('Encryption failed:', error.message);
     return null;
   }
 }
 
 async function handleConnect(req) {
   try {
+    console.log('=== CONNECT API CALLED ===');
+    console.log('Request method:', req.method);
+    console.log('Request URL:', req.url);
+    
     // Extract owner username from query string
     const url = req.nextUrl || req.url;
     let ownername = null;
@@ -81,8 +92,15 @@ async function handleConnect(req) {
       const parsedUrl = typeof url === 'string' ? new URL(url, 'http://localhost') : url;
       ownername = parsedUrl.searchParams ? parsedUrl.searchParams.get('username') : parsedUrl.searchParams.get('username');
     }
+    console.log('Owner name:', ownername);
+    
     if (!ownername) {
-      return NextResponse.json({ error: 'Owner not specified in query' }, { status: 400 });
+      console.log('ERROR: Owner not specified in query');
+      return NextResponse.json({ 
+        status: false, 
+        error: 'Owner not specified in query',
+        debug: 'Missing username parameter'
+      }, { status: 400 });
     }
 
     // Parse form data (matching C++ client format)
@@ -91,30 +109,45 @@ async function handleConnect(req) {
     const encryptedData = formData.get('user_key'); // Encrypted data from client
     const serial = formData.get('serial');
 
-    console.log('Incoming encrypted POST:', { game, encryptedData: encryptedData ? 'present' : 'missing', serial });
+    console.log('Form data received:', { 
+      game: game || 'MISSING', 
+      encryptedData: encryptedData ? 'PRESENT (' + encryptedData.length + ' chars)' : 'MISSING', 
+      serial: serial || 'MISSING' 
+    });
 
     // Validate required fields
     if (!game || !encryptedData || !serial) {
-      console.log('Missing required fields');
-      return NextResponse.json({}, { status: 200 });
+      console.log('ERROR: Missing required fields');
+      return NextResponse.json({ 
+        status: false, 
+        error: 'Missing required fields',
+        debug: { game: !!game, encryptedData: !!encryptedData, serial: !!serial }
+      }, { status: 200 });
     }
 
     // Decrypt the client request
     const decryptedData = decryptRequest(encryptedData);
     if (!decryptedData) {
-      console.log('Failed to decrypt request');
-      return NextResponse.json({ error: 'Invalid request format' }, { status: 400 });
+      console.log('ERROR: Failed to decrypt request');
+      return NextResponse.json({ 
+        status: false, 
+        error: 'Invalid request format',
+        debug: 'Decryption failed'
+      }, { status: 400 });
     }
 
     const { userKey, uuid, timestamp, nonce } = decryptedData;
-
-    console.log('Decrypted request:', { userKey, uuid, timestamp, nonce });
+    console.log('Decrypted request data:', { userKey, uuid, timestamp, nonce });
 
     // Validate timestamp (prevent replay attacks)
     const currentTime = Math.floor(Date.now() / 1000);
     if (Math.abs(currentTime - timestamp) > 300) { // 5 minutes tolerance
-      console.log('Request timestamp too old or in future');
-      return NextResponse.json({ error: 'Invalid timestamp' }, { status: 400 });
+      console.log('ERROR: Request timestamp too old or in future');
+      return NextResponse.json({ 
+        status: false, 
+        error: 'Invalid timestamp',
+        debug: { currentTime, timestamp, difference: Math.abs(currentTime - timestamp) }
+      }, { status: 400 });
     }
 
     // Check maintenance mode for the specific owner
@@ -129,7 +162,7 @@ async function handleConnect(req) {
       'SELECT * FROM keys_code WHERE user_key = ? AND game = ? AND status = 1 AND owner = ?',
       [userKey, game, ownername]
     );
-    console.log('Key lookup result:', keys);
+    console.log('Key lookup result:', keys.length > 0 ? 'FOUND' : 'NOT FOUND');
 
     if (keys.length === 0) {
       console.log('Key not found or inactive');
@@ -182,7 +215,8 @@ async function handleConnect(req) {
       const errorResponse = {
         status: false,
         reason: functions.Maintenance || 'System offline',
-        request_timestamp: timestamp
+        request_timestamp: timestamp,
+        debug: 'System offline'
       };
       const encryptedError = encryptResponse(errorResponse);
       return NextResponse.json({ encrypted_data: encryptedError }, { status: 200 });
@@ -229,14 +263,19 @@ async function handleConnect(req) {
       server_signature: serverSignature,
       request_timestamp: timestamp,
       nocashhost: true,
-      connect: true
+      connect: true,
+      debug: 'Success response'
     };
 
     // Encrypt the response
     const encryptedResponse = encryptResponse(responseData);
     if (!encryptedResponse) {
       console.error('Failed to encrypt response');
-      return NextResponse.json({ error: 'Encryption failed' }, { status: 500 });
+      return NextResponse.json({ 
+        status: false, 
+        error: 'Encryption failed',
+        debug: 'Server encryption error'
+      }, { status: 500 });
     }
 
     console.log('Returning encrypted success response');
@@ -244,7 +283,11 @@ async function handleConnect(req) {
 
   } catch (error) {
     console.error('Connect API error:', error);
-    return NextResponse.json({}, { status: 200 });
+    return NextResponse.json({ 
+      status: false, 
+      error: 'Server error',
+      debug: error.message
+    }, { status: 200 });
   }
 }
 
