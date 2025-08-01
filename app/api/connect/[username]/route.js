@@ -4,100 +4,59 @@ import { CONNECT_API_STATIC } from '../../../../lib/auth.js';
 import CryptoJS from 'crypto-js';
 import crypto from 'crypto';
 
-// Server private key (should be stored securely in production)
-const SERVER_PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----
-MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC24XkiFVXMRjFZ
-CXJfZCpS/3DRIAcwnip6cWkrbhhuJ26iJfat+vR3BJfQly6f8pwge9w3xcjsd3/0
-5rx9n8vdGyTmb1azrDMe2lZRL2q7zR6+EOvVtKEXCa+e8AV5cNcDhn5WK9bb4yOk
-l+FcDTVWvkszOnq7gyGR/U2UOXzczsmG5mrPRUX4E6vO3K6gJbxNDsRlkONYJB7r
-bFQztw7Raf5D7SanbuzVjs4doMNkLGl7Cl81juf1BlkRv/uk/K1kHK1pqH1tZe9o
-FJu0eX4lWMBI1bVAwDOKLe7yK2dvttqJ5Jx7nwhSXQB/rFPQePp+gDxdu4WOqdzl
-LVgM5XhxAgMBAAECggEAL/8c+4T97468hNGl4sM3GHFR+pCdUnUwUNJS98L9Rmuy
-7XtpMmAaqOHbtjL3WaMitqPLOBgAk48JVgz4iz/VEUJ+fLvb1WvsPryuyr/XE1LS
-Lq/iNUQiwxkXrm7wAN9MjvBNV/BJg4wpXpk93BrbVNi8g8VlULEprlb8dVphGtH5
-HR4552yOpWS51+P1qtPRxSFDYhtPX4eilMAQMOCIZ8d+lKFCQbxPhDBuGVLmPBlt
-ONAkdA+in88pXiWTisA58gEsn/sk133aLtKlGCOVG6BGaib0gcNtVE3V2/3i/kao
-ojfXWZrOg8k0o2aNzhskWqxiF2nkoggl3sDkLwwBwQKBgQDaznMENjTPOPqKPwBc
-eYzEHF06j8KYJSServcSst7mUumvPAodGsMtMqh3n4BqwtxEKyTCn2Si7b0FtIck
-SsvlRQvZtwBWH/UHVSFltih+hTQRYWaFZHMHX/LYrFlE6Zkv8rHQTJeYBfo8ncms
-ZXZpy3Hqet4wnTJD3Y1bHoh1swKBgQDV96/IoJavKBFIqs2XtKAqEPnOXoRyzqMS
-RP3f2iLLu/FUkNHJ6/KyDhA3Y62RzGvejSNUmxrt4K5l+qXiTUZh7SEKc+kYBbiP
-xhQED89A4zfxMJUSM5SgvP8pp2b8t4FYD+2YP223wt1IGa57xOTC3D4767xKDKm6
-RD/5XCSPSwKBgAVMaIaalW7LL233lpemrdz13uATKSAsDhX1oLAIOtOTAGuo5YnM
-4xsOFfxHlYGAVHsmHE7GM1aqsSAZPgiH8yYLJP1RrCVpwrI5woRHA/YEXb1qAWSL
-iSmNjkDm84Zyra32j42+vREGXAfpvj95eYOYVJrb/NNqixQPomOpep53AoGBAL+N
-GSqkUaIHXcnPV3Ub+FMQlYLh7PMW+LhPWXSAxavc2oUZjSaW+9PZcT0VGHsxJdS8
-R8fjf607+wVC6iT5hyv97Rl9gUzHOl5ENwEX4jQ19owPMTV1RfbMnCZ/Ply6L6pV
-wCAPkLr1UcLNcv5M23tzTqe4N/2W7o/Zr+geTICXAoGBAJaMXVlupe0tC1BNQfio
-P9T2SsjUTdWeyUFHdLRZJjfy9mHzeyELYgL6CcwwTAFyMcUfwDznlX9tLYqWvlpR
-KWSMRd8EQIjSf4t4GAlGE1o4NcN/C8zOARzqek+iqan8UepVqrh5xFPKDzq6Fw8m
-SML7tM0ng970IVzHh+fnUMQ8
------END PRIVATE KEY-----`;
+// AES encryption key (should be stored securely in production)
+const AES_KEY = "nocashhost_secret_key_32_bytes_long!!"; // Same key as client
 
-// Function to decrypt client requests
+// Function to decrypt client requests using AES-256-GCM
 function decryptRequest(encryptedData) {
   try {
-    console.log('Attempting to decrypt:', encryptedData ? encryptedData.substring(0, 50) + '...' : 'null');
+    console.log('Attempting to decrypt AES data:', encryptedData ? encryptedData.substring(0, 50) + '...' : 'null');
     
-    const privateKey = crypto.createPrivateKey(SERVER_PRIVATE_KEY);
     const buffer = Buffer.from(encryptedData, 'base64');
     
-    // Try different OAEP hash algorithms
-    const decryptionAttempts = [
-      { padding: crypto.constants.RSA_PKCS1_OAEP_PADDING, oaepHash: 'sha1', name: 'OAEP-SHA1' },
-      { padding: crypto.constants.RSA_PKCS1_OAEP_PADDING, oaepHash: 'sha256', name: 'OAEP-SHA256' },
-      { padding: crypto.constants.RSA_PKCS1_OAEP_PADDING, name: 'OAEP-DEFAULT' }
-    ];
+    // Decrypt using AES-256-GCM
+    const decipher = crypto.createDecipher('aes-256-gcm', AES_KEY);
     
-    for (const attempt of decryptionAttempts) {
-      try {
-        const options = {
-          key: privateKey,
-          padding: attempt.padding,
-        };
-        
-        if (attempt.oaepHash) {
-          options.oaepHash = attempt.oaepHash;
-        }
-        
-        const decrypted = crypto.privateDecrypt(options, buffer);
-        const result = JSON.parse(decrypted.toString());
-        console.log(`✅ Successfully decrypted request with ${attempt.name}:`, result);
-        return result;
-      } catch (decryptError) {
-        console.log(`❌ Failed with ${attempt.name}:`, decryptError.message);
-        continue;
-      }
-    }
+    // Extract IV (first 12 bytes) and tag (last 16 bytes)
+    const iv = buffer.slice(0, 12);
+    const tag = buffer.slice(buffer.length - 16);
+    const ciphertext = buffer.slice(12, buffer.length - 16);
     
-    console.error('All decryption attempts failed');
-    return null;
+    decipher.setAuthTag(tag);
+    
+    let decrypted = decipher.update(ciphertext, null, 'utf8');
+    decrypted += decipher.final('utf8');
+    
+    const result = JSON.parse(decrypted);
+    console.log('✅ Successfully decrypted AES request:', result);
+    return result;
   } catch (error) {
-    console.error('Decryption failed:', error.message);
+    console.error('AES decryption failed:', error.message);
     return null;
   }
 }
 
-// Function to encrypt server responses
+// Function to encrypt server responses using AES-256-GCM
 function encryptResponse(responseData) {
   try {
-    console.log('Encrypting response:', responseData);
+    console.log('Encrypting AES response:', responseData);
     const responseJson = JSON.stringify(responseData);
-    const privateKey = crypto.createPrivateKey(SERVER_PRIVATE_KEY);
-    const publicKey = crypto.createPublicKey(privateKey);
-          const encrypted = crypto.publicEncrypt(
-        {
-          key: publicKey,
-          padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-          oaepHash: 'sha1',
-        },
-        Buffer.from(responseJson)
-      );
-    const result = encrypted.toString('base64');
-    console.log('Successfully encrypted response, length:', result.length);
+    
+    // Encrypt using AES-256-GCM
+    const cipher = crypto.createCipher('aes-256-gcm', AES_KEY);
+    
+    let encrypted = cipher.update(responseJson, 'utf8', 'base64');
+    encrypted += cipher.final('base64');
+    
+    // Get the auth tag
+    const tag = cipher.getAuthTag();
+    
+    // Combine encrypted data with tag
+    const result = encrypted + tag.toString('base64');
+    console.log('Successfully encrypted AES response, length:', result.length);
     return result;
   } catch (error) {
-    console.error('Encryption failed:', error.message);
+    console.error('AES encryption failed:', error.message);
     return null;
   }
 }
