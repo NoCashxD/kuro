@@ -14,14 +14,13 @@ function decryptRequest(encryptedData) {
     
     const buffer = Buffer.from(encryptedData, 'base64');
     
-    // Decrypt using AES-256-GCM
-    const decipher = crypto.createDecipher('aes-256-gcm', AES_KEY);
-    
     // Extract IV (first 12 bytes) and tag (last 16 bytes)
     const iv = buffer.slice(0, 12);
     const tag = buffer.slice(buffer.length - 16);
     const ciphertext = buffer.slice(12, buffer.length - 16);
     
+    // Decrypt using AES-256-GCM with IV
+    const decipher = crypto.createDecipheriv('aes-256-gcm', Buffer.from(AES_KEY), iv);
     decipher.setAuthTag(tag);
     
     let decrypted = decipher.update(ciphertext, null, 'utf8');
@@ -42,8 +41,11 @@ function encryptResponse(responseData) {
     console.log('Encrypting AES response:', responseData);
     const responseJson = JSON.stringify(responseData);
     
-    // Encrypt using AES-256-GCM
-    const cipher = crypto.createCipher('aes-256-gcm', AES_KEY);
+    // Generate random IV
+    const iv = crypto.randomBytes(12);
+    
+    // Encrypt using AES-256-GCM with IV
+    const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(AES_KEY), iv);
     
     let encrypted = cipher.update(responseJson, 'utf8', 'base64');
     encrypted += cipher.final('base64');
@@ -51,8 +53,8 @@ function encryptResponse(responseData) {
     // Get the auth tag
     const tag = cipher.getAuthTag();
     
-    // Combine encrypted data with tag
-    const result = encrypted + tag.toString('base64');
+    // Combine IV + encrypted data + tag
+    const result = iv.toString('base64') + encrypted + tag.toString('base64');
     console.log('Successfully encrypted AES response, length:', result.length);
     return result;
   } catch (error) {
