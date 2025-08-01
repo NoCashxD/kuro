@@ -41,13 +41,14 @@ function decryptRequest(encryptedData) {
     
     const privateKey = crypto.createPrivateKey(SERVER_PRIVATE_KEY);
     const buffer = Buffer.from(encryptedData, 'base64');
-    const decrypted = crypto.privateDecrypt(
-      {
-        key: privateKey,
-        padding: crypto.constants.RSA_PKCS1_PADDING,
-      },
-      buffer
-    );
+            const decrypted = crypto.privateDecrypt(
+          {
+            key: privateKey,
+            padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+            oaepHash: 'sha1',
+          },
+          buffer
+        );
     const result = JSON.parse(decrypted.toString());
     console.log('Successfully decrypted request:', result);
     return result;
@@ -64,13 +65,14 @@ function encryptResponse(responseData) {
     const responseJson = JSON.stringify(responseData);
     const privateKey = crypto.createPrivateKey(SERVER_PRIVATE_KEY);
     const publicKey = crypto.createPublicKey(privateKey);
-    const encrypted = crypto.publicEncrypt(
-      {
-        key: publicKey,
-        padding: crypto.constants.RSA_PKCS1_PADDING,
-      },
-      Buffer.from(responseJson)
-    );
+          const encrypted = crypto.publicEncrypt(
+        {
+          key: publicKey,
+          padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+          oaepHash: 'sha1',
+        },
+        Buffer.from(responseJson)
+      );
     const result = encrypted.toString('base64');
     console.log('Successfully encrypted response, length:', result.length);
     return result;
