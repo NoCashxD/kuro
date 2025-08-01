@@ -7,53 +7,45 @@ import crypto from 'crypto';
 // AES encryption key (should be stored securely in production)
 const AES_KEY = "nocashhost_secret_key_32_bytes!!"; // Same key as client
 
-// Function to decrypt client requests using AES-256-CBC
+// Function to decrypt client requests using XOR
 function decryptRequest(encryptedData) {
   try {
-    console.log('Attempting to decrypt AES data:', encryptedData ? encryptedData.substring(0, 50) + '...' : 'null');
+    console.log('Attempting to decrypt XOR data:', encryptedData ? encryptedData.substring(0, 50) + '...' : 'null');
     
     const buffer = Buffer.from(encryptedData, 'base64');
     
-    // Extract IV (first 16 bytes) and ciphertext
-    const iv = buffer.slice(0, 16);
-    const ciphertext = buffer.slice(16);
-    
-    // Decrypt using AES-256-CBC with IV
-    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(AES_KEY), iv);
-    
-    let decrypted = decipher.update(ciphertext, null, 'utf8');
-    decrypted += decipher.final('utf8');
+    // XOR decryption
+    let decrypted = '';
+    for (let i = 0; i < buffer.length; i++) {
+      decrypted += String.fromCharCode(buffer[i] ^ AES_KEY.charCodeAt(i % AES_KEY.length));
+    }
     
     const result = JSON.parse(decrypted);
-    console.log('✅ Successfully decrypted AES request:', result);
+    console.log('✅ Successfully decrypted XOR request:', result);
     return result;
   } catch (error) {
-    console.error('AES decryption failed:', error.message);
+    console.error('XOR decryption failed:', error.message);
     return null;
   }
 }
 
-// Function to encrypt server responses using AES-256-CBC
+// Function to encrypt server responses using XOR
 function encryptResponse(responseData) {
   try {
-    console.log('Encrypting AES response:', responseData);
+    console.log('Encrypting XOR response:', responseData);
     const responseJson = JSON.stringify(responseData);
     
-    // Generate random IV (16 bytes for AES-CBC)
-    const iv = crypto.randomBytes(16);
+    // XOR encryption
+    let encrypted = '';
+    for (let i = 0; i < responseJson.length; i++) {
+      encrypted += String.fromCharCode(responseJson.charCodeAt(i) ^ AES_KEY.charCodeAt(i % AES_KEY.length));
+    }
     
-    // Encrypt using AES-256-CBC with IV
-    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(AES_KEY), iv);
-    
-    let encrypted = cipher.update(responseJson, 'utf8', 'base64');
-    encrypted += cipher.final('base64');
-    
-    // Combine IV + encrypted data
-    const result = iv.toString('base64') + encrypted;
-    console.log('Successfully encrypted AES response, length:', result.length);
+    const result = Buffer.from(encrypted).toString('base64');
+    console.log('Successfully encrypted XOR response, length:', result.length);
     return result;
   } catch (error) {
-    console.error('AES encryption failed:', error.message);
+    console.error('XOR encryption failed:', error.message);
     return null;
   }
 }
