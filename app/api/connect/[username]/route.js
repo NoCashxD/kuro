@@ -12,7 +12,9 @@ function decryptRequest(encryptedData) {
   try {
     console.log('Attempting to decrypt XOR data:', encryptedData ? encryptedData.substring(0, 50) + '...' : 'null');
     
-    const buffer = Buffer.from(encryptedData, 'base64');
+    // First, URL decode the data since the client sends it URL-encoded
+    const urlDecoded = decodeURIComponent(encryptedData);
+    const buffer = Buffer.from(urlDecoded, 'binary');
     
     // XOR decryption
     let decrypted = '';
