@@ -44,8 +44,7 @@ function decryptRequest(encryptedData) {
     const decrypted = crypto.privateDecrypt(
       {
         key: privateKey,
-        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-        oaepHash: 'sha1',
+        padding: crypto.constants.RSA_PKCS1_PADDING,
       },
       buffer
     );
@@ -68,8 +67,7 @@ function encryptResponse(responseData) {
     const encrypted = crypto.publicEncrypt(
       {
         key: publicKey,
-        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-        oaepHash: 'sha1',
+        padding: crypto.constants.RSA_PKCS1_PADDING,
       },
       Buffer.from(responseJson)
     );
