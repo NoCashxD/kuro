@@ -42,26 +42,30 @@ function decryptRequest(encryptedData) {
     const privateKey = crypto.createPrivateKey(SERVER_PRIVATE_KEY);
     const buffer = Buffer.from(encryptedData, 'base64');
     
-    // Try different hash algorithms for OAEP
-    const hashAlgorithms = ['sha1', 'sha256', null]; // null = default
+    // Try different OAEP hash algorithms
+    const decryptionAttempts = [
+      { padding: crypto.constants.RSA_PKCS1_OAEP_PADDING, oaepHash: 'sha1', name: 'OAEP-SHA1' },
+      { padding: crypto.constants.RSA_PKCS1_OAEP_PADDING, oaepHash: 'sha256', name: 'OAEP-SHA256' },
+      { padding: crypto.constants.RSA_PKCS1_OAEP_PADDING, name: 'OAEP-DEFAULT' }
+    ];
     
-    for (const hash of hashAlgorithms) {
+    for (const attempt of decryptionAttempts) {
       try {
         const options = {
           key: privateKey,
-          padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+          padding: attempt.padding,
         };
         
-        if (hash) {
-          options.oaepHash = hash;
+        if (attempt.oaepHash) {
+          options.oaepHash = attempt.oaepHash;
         }
         
         const decrypted = crypto.privateDecrypt(options, buffer);
         const result = JSON.parse(decrypted.toString());
-        console.log(`Successfully decrypted request with ${hash || 'default'} hash:`, result);
+        console.log(`✅ Successfully decrypted request with ${attempt.name}:`, result);
         return result;
-      } catch (hashError) {
-        console.log(`Failed with ${hash || 'default'} hash:`, hashError.message);
+      } catch (decryptError) {
+        console.log(`❌ Failed with ${attempt.name}:`, decryptError.message);
         continue;
       }
     }
