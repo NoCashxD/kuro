@@ -135,6 +135,9 @@ async function handleConnect(req,params) {
     return NextResponse.json({}, { status: 200 });
   }
 }
+export async function POST(req, { params }) {
+  return handleConnect(req, params);
+}
 
 export async function GET(req) {
   const webInfo = {
