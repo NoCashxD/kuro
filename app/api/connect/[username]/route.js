@@ -1,160 +1,27 @@
 import { NextResponse } from 'next/server';
-import { query } from '../../../../lib/db.js';
-import { CONNECT_API_STATIC } from '../../../../lib/auth.js';
+import { query } from '../../../lib/db.js';
+import { CONNECT_API_STATIC } from '../../../lib/auth.js';
 import CryptoJS from 'crypto-js';
-import crypto from 'crypto';
 
-// AES encryption key (should be stored securely in production)
-const AES_KEY = "nocashhost_secret_key_32_bytes!!"; // Same key as client
-
-// Function to decrypt client requests using XOR
-function decryptRequest(encryptedData) {
+async function handleConnect(req,params) {
   try {
-    console.log('Attempting to decrypt XOR data:', encryptedData ? encryptedData.substring(0, 50) + '...' : 'null');
-    
-    // First, URL decode the data since the client sends it URL-encoded
-    const urlDecoded = decodeURIComponent(encryptedData);
-    const buffer = Buffer.from(urlDecoded, 'binary');
-    
-    // XOR decryption
-    let decrypted = '';
-    for (let i = 0; i < buffer.length; i++) {
-      decrypted += String.fromCharCode(buffer[i] ^ AES_KEY.charCodeAt(i % AES_KEY.length));
-    }
-    
-    // Debug: Log the decrypted data
-    console.log('Decrypted data preview:', decrypted.substring(0, 100));
-    
-    const result = JSON.parse(decrypted);
-    console.log('✅ Successfully decrypted XOR request:', result);
-    return result;
-  } catch (error) {
-    console.error('XOR decryption failed:', error.message);
-    return null;
-  }
-}
-
-// Function to encrypt server responses using XOR
-function encryptResponse(responseData) {
-  try {
-    console.log('Encrypting XOR response:', responseData);
-    const responseJson = JSON.stringify(responseData);
-    
-    // XOR encryption
-    let encrypted = '';
-    for (let i = 0; i < responseJson.length; i++) {
-      encrypted += String.fromCharCode(responseJson.charCodeAt(i) ^ AES_KEY.charCodeAt(i % AES_KEY.length));
-    }
-    
-    // Send the encrypted data directly (not base64 encoded) to match client expectations
-    console.log('Successfully encrypted XOR response, length:', encrypted.length);
-    return encrypted;
-  } catch (error) {
-    console.error('XOR encryption failed:', error.message);
-    return null;
-  }
-}
-
-async function handleConnect(req, { params }) {
-  try {
-    console.log('=== CONNECT API CALLED ===');
-    console.log('Request method:', req.method);
-    console.log('Request URL:', req.url);
-    
-    // Extract owner username from URL params
+    // Extract owner username from query string
     const ownername = params.username;
-    console.log('Owner name:', ownername);
-    
     if (!ownername) {
-      console.log('ERROR: Owner not specified in URL path');
-      return NextResponse.json({ 
-        status: false, 
-        error: 'Owner not specified in URL path',
-        debug: 'Missing username in path'
-      }, { status: 400 });
+      return NextResponse.json({ error: 'Owner not specified in query' }, { status: 400 });
     }
-
     // Parse form data (matching C++ client format)
     const formData = await req.formData();
     const game = formData.get('game');
-    const encryptedData = formData.get('user_key'); // Encrypted data from client
+    const userKey = formData.get('user_key');
     const serial = formData.get('serial');
-    
-    // Debug: Log all form fields
-    console.log('All form fields:');
-    for (const [key, value] of formData.entries()) {
-      console.log(`  ${key}: ${value}`);
-    }
 
-    console.log('Form data received:', { 
-      game: game || 'MISSING', 
-      encryptedData: encryptedData ? 'PRESENT (' + encryptedData.length + ' chars)' : 'MISSING', 
-      serial: serial || 'MISSING' 
-    });
+    console.log('Incoming POST:', { game, userKey, serial });
 
     // Validate required fields
-    if (!game || !encryptedData || !serial) {
-      console.log('ERROR: Missing required fields');
-      
-      // Get all form fields for debugging
-      const allFields = {};
-      for (const [key, value] of formData.entries()) {
-        allFields[key] = value;
-      }
-      
-      return NextResponse.json({ 
-        status: false, 
-        error: 'Missing required fields',
-        debug: { 
-          game: !!game, 
-          encryptedData: !!encryptedData, 
-          serial: !!serial,
-          allFields: allFields,
-          receivedGame: game,
-          receivedSerial: serial,
-          encryptedDataLength: encryptedData ? encryptedData.length : 0
-        }
-      }, { status: 200 });
-    }
-
-    // Decrypt the client request
-    const decryptedData = decryptRequest(encryptedData);
-    if (!decryptedData) {
-      console.log('ERROR: Failed to decrypt request');
-      
-      // Get all form fields for debugging
-      const allFields = {};
-      for (const [key, value] of formData.entries()) {
-        allFields[key] = value;
-      }
-      
-      return NextResponse.json({ 
-        status: false, 
-        error: 'Invalid request format',
-        debug: 'Decryption failed',
-        serverDebug: {
-          encryptedDataLength: encryptedData ? encryptedData.length : 0,
-          encryptedDataPreview: encryptedData ? encryptedData.substring(0, 50) + '...' : 'null',
-          allFields: allFields,
-          hasSerial: !!formData.get('serial'),
-          hasGame: !!formData.get('game'),
-          hasUserKey: !!formData.get('user_key')
-        }
-      }, { status: 400 });
-    }
-
-    const { userKey, uuid, timestamp, nonce } = decryptedData;
-    console.log('Decrypted request data:', { userKey, uuid, timestamp, nonce });
-
-    // Validate timestamp (prevent replay attacks)
-    const currentTime = Math.floor(Date.now() / 1000);
-    if (Math.abs(currentTime - timestamp) > 300) { // 5 minutes tolerance
-      console.log('ERROR: Request timestamp too old or in future');
-      return NextResponse.json({ 
-        status: false, 
-        error: 'Invalid timestamp',
-        debug: { currentTime, timestamp, difference: Math.abs(currentTime - timestamp) }
-      }, { status: 400 });
+    if (!game || !userKey || !serial) {
+      console.log('Missing required fields');
+      return NextResponse.json({}, { status: 200 });
     }
 
     // Check maintenance mode for the specific owner
@@ -169,7 +36,7 @@ async function handleConnect(req, { params }) {
       'SELECT * FROM keys_code WHERE user_key = ? AND game = ? AND status = 1 AND owner = ?',
       [userKey, game, ownername]
     );
-    console.log('Key lookup result:', keys.length > 0 ? 'FOUND' : 'NOT FOUND');
+    console.log('Key lookup result:', keys);
 
     if (keys.length === 0) {
       console.log('Key not found or inactive');
@@ -219,20 +86,16 @@ async function handleConnect(req, { params }) {
     // Check if system is online for the specific owner
     if (functions.Online !== 'true') {
       console.log('System is offline');
-      const errorResponse = {
+      return NextResponse.json({
         status: false,
-        reason: functions.Maintenance || 'System offline',
-        request_timestamp: timestamp,
-        debug: 'System offline'
-      };
-      const encryptedError = encryptResponse(errorResponse);
-      return NextResponse.json({ encrypted_data: encryptedError }, { status: 200 });
+        reason: functions.Maintenance || 'System offline'
+      }, { status: 200 });
     }
 
     // Get mod name for the specific owner
     const modNameData = await query('SELECT * FROM modname WHERE owner = ? LIMIT 1', [ownername]);
     const modName = modNameData.length > 0 ? modNameData[0].modname : 'NOCASH';
-    
+
     // Get credit info for the specific owner
     const ftextData = await query('SELECT * FROM _ftext WHERE owner = ? LIMIT 1', [ownername]);
     const credit = ftextData.length > 0 ? ftextData[0].credit || '0' : '0';
@@ -253,52 +116,27 @@ async function handleConnect(req, { params }) {
     const authString = `${game}-${userKey}-${serial}-${CONNECT_API_STATIC}`;
     const token = CryptoJS.MD5(authString).toString();
 
-    // Generate server signature for additional security
-    const signatureData = `${token}-${Math.floor(new Date(expiredDate).getTime() / 1000)}-${CONNECT_API_STATIC}`;
-    const serverSignature = CryptoJS.SHA256(signatureData).toString();
-
-    // Prepare encrypted response matching C++ client expectations
+    // Prepare response matching C++ client expectations
     const responseData = {
       status: true,
       data: {
         token: token,
         rng: Math.floor(new Date(expiredDate).getTime() / 1000), // Unix timestamp
-        EXP: Math.floor(new Date(expiredDate).getTime() / 1000),
+        EXP : Math.floor(new Date(expiredDate).getTime() / 1000),
         credit: credit,
         modname: modName
-      },
-      server_signature: serverSignature,
-      request_timestamp: timestamp,
-      nocashhost: true,
-      connect: true,
-      debug: 'Success response'
+      }
     };
-
-    // Encrypt the response
-    const encryptedResponse = encryptResponse(responseData);
-    if (!encryptedResponse) {
-      console.error('Failed to encrypt response');
-      return NextResponse.json({ 
-        status: false, 
-        error: 'Encryption failed',
-        debug: 'Server encryption error'
-      }, { status: 500 });
-    }
-
-    console.log('Returning encrypted success response');
-    return NextResponse.json({ encrypted_data: encryptedResponse }, { status: 200 });
+    console.log('Returning success:', responseData);
+    return NextResponse.json(responseData, { status: 200 });
 
   } catch (error) {
     console.error('Connect API error:', error);
-    return NextResponse.json({ 
-      status: false, 
-      error: 'Server error',
-      debug: error.message
-    }, { status: 200 });
+    return NextResponse.json({}, { status: 200 });
   }
 }
 
-export async function GET(req, { params }) {
+export async function GET(req) {
   const webInfo = {
     web_info: {
       _client: "Kuro Panel",
@@ -311,5 +149,3 @@ export async function GET(req, { params }) {
   };
   return NextResponse.json(webInfo);
 }
-
-export const POST = handleConnect; 
