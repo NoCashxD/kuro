@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { query } from '../../../lib/db.js';
-import { CONNECT_API_STATIC } from '../../../lib/auth.js';
+import { query } from '../../../../lib/db.js';
+import { CONNECT_API_STATIC } from '../../../../lib/auth.js';
 import CryptoJS from 'crypto-js';
 
 async function handleConnect(req,params) {
